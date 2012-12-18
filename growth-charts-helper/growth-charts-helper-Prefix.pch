@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'growth-charts-helper' target in the 'growth-charts-helper' project
+//
+
+#ifdef __OBJC__
+	#import <Cocoa/Cocoa.h>
+#endif
