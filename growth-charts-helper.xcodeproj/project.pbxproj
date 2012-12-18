@@ -14,6 +14,17 @@
 		EEEB2D891680E014004DC719 /* CHDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2D881680E014004DC719 /* CHDocument.m */; };
 		EEEB2D8C1680E014004DC719 /* CHDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = EEEB2D8A1680E014004DC719 /* CHDocument.xib */; };
 		EEEB2D8F1680E014004DC719 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = EEEB2D8D1680E014004DC719 /* MainMenu.xib */; };
+		EEEB2DBC1680EA54004DC719 /* CHChartArea.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DBB1680EA54004DC719 /* CHChartArea.m */; };
+		EEEB2DBF1680EA70004DC719 /* PPRange.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DBE1680EA70004DC719 /* PPRange.m */; };
+		EEEB2DC61680EA8A004DC719 /* CHValue.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DC11680EA8A004DC719 /* CHValue.m */; };
+		EEEB2DC71680EA8A004DC719 /* CHUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DC31680EA8A004DC719 /* CHUnit.m */; };
+		EEEB2DC81680EA8A004DC719 /* CHDateUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DC51680EA8A004DC719 /* CHDateUnit.m */; };
+		EEEB2DCB1680EC6C004DC719 /* CHChart.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DCA1680EC6C004DC719 /* CHChart.m */; };
+		EEEB2DD11680EE05004DC719 /* NSDecimalNumber+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DD01680EE05004DC719 /* NSDecimalNumber+Extension.m */; };
+		EEEB2DD41680EE70004DC719 /* CHChartAreaView.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DD31680EE70004DC719 /* CHChartAreaView.m */; };
+		EEEB2DD61680F1E0004DC719 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEEB2DD51680F1E0004DC719 /* QuartzCore.framework */; };
+		EEEB2DD91680FA96004DC719 /* CHWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DD81680FA95004DC719 /* CHWindowController.m */; };
+		EEEB2DDC1680FFC7004DC719 /* CHEnumToNumberTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DDB1680FFC7004DC719 /* CHEnumToNumberTransformer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +42,29 @@
 		EEEB2D881680E014004DC719 /* CHDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHDocument.m; sourceTree = "<group>"; };
 		EEEB2D8B1680E014004DC719 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/CHDocument.xib; sourceTree = "<group>"; };
 		EEEB2D8E1680E014004DC719 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		EEEB2DB71680EA12004DC719 /* CHTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHTypes.h; sourceTree = "<group>"; };
+		EEEB2DB81680EA12004DC719 /* CHJSONHandling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHJSONHandling.h; sourceTree = "<group>"; };
+		EEEB2DBA1680EA54004DC719 /* CHChartArea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHChartArea.h; sourceTree = "<group>"; };
+		EEEB2DBB1680EA54004DC719 /* CHChartArea.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHChartArea.m; sourceTree = "<group>"; };
+		EEEB2DBD1680EA70004DC719 /* PPRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PPRange.h; sourceTree = "<group>"; };
+		EEEB2DBE1680EA70004DC719 /* PPRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PPRange.m; sourceTree = "<group>"; };
+		EEEB2DC01680EA8A004DC719 /* CHValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHValue.h; sourceTree = "<group>"; };
+		EEEB2DC11680EA8A004DC719 /* CHValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHValue.m; sourceTree = "<group>"; };
+		EEEB2DC21680EA8A004DC719 /* CHUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHUnit.h; sourceTree = "<group>"; };
+		EEEB2DC31680EA8A004DC719 /* CHUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHUnit.m; sourceTree = "<group>"; };
+		EEEB2DC41680EA8A004DC719 /* CHDateUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHDateUnit.h; sourceTree = "<group>"; };
+		EEEB2DC51680EA8A004DC719 /* CHDateUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHDateUnit.m; sourceTree = "<group>"; };
+		EEEB2DC91680EC6C004DC719 /* CHChart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHChart.h; sourceTree = "<group>"; };
+		EEEB2DCA1680EC6C004DC719 /* CHChart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHChart.m; sourceTree = "<group>"; };
+		EEEB2DCF1680EE04004DC719 /* NSDecimalNumber+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDecimalNumber+Extension.h"; sourceTree = "<group>"; };
+		EEEB2DD01680EE05004DC719 /* NSDecimalNumber+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDecimalNumber+Extension.m"; sourceTree = "<group>"; };
+		EEEB2DD21680EE70004DC719 /* CHChartAreaView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHChartAreaView.h; sourceTree = "<group>"; };
+		EEEB2DD31680EE70004DC719 /* CHChartAreaView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHChartAreaView.m; sourceTree = "<group>"; };
+		EEEB2DD51680F1E0004DC719 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		EEEB2DD71680FA95004DC719 /* CHWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHWindowController.h; sourceTree = "<group>"; };
+		EEEB2DD81680FA95004DC719 /* CHWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHWindowController.m; sourceTree = "<group>"; };
+		EEEB2DDA1680FFC7004DC719 /* CHEnumToNumberTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHEnumToNumberTransformer.h; sourceTree = "<group>"; };
+		EEEB2DDB1680FFC7004DC719 /* CHEnumToNumberTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHEnumToNumberTransformer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEEB2DD61680F1E0004DC719 /* QuartzCore.framework in Frameworks */,
 				EEEB2D761680E014004DC719 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -48,6 +83,7 @@
 		EEEB2D661680E014004DC719 = {
 			isa = PBXGroup;
 			children = (
+				EEEB2DD51680F1E0004DC719 /* QuartzCore.framework */,
 				EEEB2D7B1680E014004DC719 /* growth-charts-helper */,
 				EEEB2D741680E014004DC719 /* Frameworks */,
 				EEEB2D721680E014004DC719 /* Products */,
@@ -86,7 +122,13 @@
 			children = (
 				EEEB2D871680E014004DC719 /* CHDocument.h */,
 				EEEB2D881680E014004DC719 /* CHDocument.m */,
+				EEEB2DD71680FA95004DC719 /* CHWindowController.h */,
+				EEEB2DD81680FA95004DC719 /* CHWindowController.m */,
 				EEEB2D8A1680E014004DC719 /* CHDocument.xib */,
+				EEEB2DD21680EE70004DC719 /* CHChartAreaView.h */,
+				EEEB2DD31680EE70004DC719 /* CHChartAreaView.m */,
+				EEEB2DB91680EA29004DC719 /* FromCharts */,
+				EEEB2DDD168100EA004DC719 /* Helpers */,
 				EEEB2D8D1680E014004DC719 /* MainMenu.xib */,
 				EEEB2D7C1680E014004DC719 /* Supporting Files */,
 			);
@@ -103,6 +145,38 @@
 				EEEB2D841680E014004DC719 /* Credits.rtf */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		EEEB2DB91680EA29004DC719 /* FromCharts */ = {
+			isa = PBXGroup;
+			children = (
+				EEEB2DB71680EA12004DC719 /* CHTypes.h */,
+				EEEB2DB81680EA12004DC719 /* CHJSONHandling.h */,
+				EEEB2DC91680EC6C004DC719 /* CHChart.h */,
+				EEEB2DCA1680EC6C004DC719 /* CHChart.m */,
+				EEEB2DBA1680EA54004DC719 /* CHChartArea.h */,
+				EEEB2DBB1680EA54004DC719 /* CHChartArea.m */,
+				EEEB2DBD1680EA70004DC719 /* PPRange.h */,
+				EEEB2DBE1680EA70004DC719 /* PPRange.m */,
+				EEEB2DC01680EA8A004DC719 /* CHValue.h */,
+				EEEB2DC11680EA8A004DC719 /* CHValue.m */,
+				EEEB2DC21680EA8A004DC719 /* CHUnit.h */,
+				EEEB2DC31680EA8A004DC719 /* CHUnit.m */,
+				EEEB2DC41680EA8A004DC719 /* CHDateUnit.h */,
+				EEEB2DC51680EA8A004DC719 /* CHDateUnit.m */,
+				EEEB2DCF1680EE04004DC719 /* NSDecimalNumber+Extension.h */,
+				EEEB2DD01680EE05004DC719 /* NSDecimalNumber+Extension.m */,
+			);
+			path = FromCharts;
+			sourceTree = "<group>";
+		};
+		EEEB2DDD168100EA004DC719 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				EEEB2DDA1680FFC7004DC719 /* CHEnumToNumberTransformer.h */,
+				EEEB2DDB1680FFC7004DC719 /* CHEnumToNumberTransformer.m */,
+			);
+			name = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -173,6 +247,16 @@
 			files = (
 				EEEB2D821680E014004DC719 /* main.m in Sources */,
 				EEEB2D891680E014004DC719 /* CHDocument.m in Sources */,
+				EEEB2DBC1680EA54004DC719 /* CHChartArea.m in Sources */,
+				EEEB2DBF1680EA70004DC719 /* PPRange.m in Sources */,
+				EEEB2DC61680EA8A004DC719 /* CHValue.m in Sources */,
+				EEEB2DC71680EA8A004DC719 /* CHUnit.m in Sources */,
+				EEEB2DC81680EA8A004DC719 /* CHDateUnit.m in Sources */,
+				EEEB2DCB1680EC6C004DC719 /* CHChart.m in Sources */,
+				EEEB2DD11680EE05004DC719 /* NSDecimalNumber+Extension.m in Sources */,
+				EEEB2DD41680EE70004DC719 /* CHChartAreaView.m in Sources */,
+				EEEB2DD91680FA96004DC719 /* CHWindowController.m in Sources */,
+				EEEB2DDC1680FFC7004DC719 /* CHEnumToNumberTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +394,7 @@
 				EEEB2D941680E014004DC719 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

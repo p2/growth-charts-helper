@@ -8,6 +8,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class CHChart;
+
+
+/**
+ *  Holds our JSON description of one chart.
+ */
 @interface CHDocument : NSDocument
+
+@property (nonatomic, strong) CHChart *chart;
+
 
 @end

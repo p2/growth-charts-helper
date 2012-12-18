@@ -7,23 +7,25 @@
 //
 
 #import "CHDocument.h"
+#import "CHWindowController.h"
+#import "CHChart.h"
+
 
 @implementation CHDocument
 
+
 - (id)init
 {
-    self = [super init];
-    if (self) {
+    if ((self = [super init])) {
 		// Add your subclass-specific initialization here.
     }
     return self;
 }
 
-- (NSString *)windowNibName
+- (void)makeWindowControllers
 {
-	// Override returning the nib file name of the document
-	// If you need to use a subclass of NSWindowController or if your document supports multiple NSWindowControllers, you should remove this method and override -makeWindowControllers instead.
-	return @"CHDocument";
+	CHWindowController *controller = [[CHWindowController alloc] initWithWindowNibName:@"CHDocument"];
+	[self addWindowController:controller];
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *)aController
@@ -37,6 +39,9 @@
     return YES;
 }
 
+
+
+#pragma mark - File Reading and Writing
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
 	// Insert code here to write your document to data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning nil.
@@ -46,14 +51,16 @@
 	return nil;
 }
 
+
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
-	// Insert code here to read your document from the given data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning NO.
-	// You can also choose to override -readFromFileWrapper:ofType:error: or -readFromURL:ofType:error: instead.
-	// If you override either of these, you should also override -isEntireFileLoaded to return NO if the contents are lazily loaded.
-	NSException *exception = [NSException exceptionWithName:@"UnimplementedMethod" reason:[NSString stringWithFormat:@"%@ is unimplemented", NSStringFromSelector(_cmd)] userInfo:nil];
-	@throw exception;
-	return YES;
+	DLog(@"type: %@", typeName);
+	NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:outError];
+	if ([dict isKindOfClass:[NSDictionary class]]) {
+		self.chart = [CHChart newFromJSONObject:dict];
+	}
+	return (nil != _chart);
 }
+
 
 @end
