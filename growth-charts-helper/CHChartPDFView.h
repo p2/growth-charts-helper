@@ -1,5 +1,5 @@
 /*
- CHDocumentController.h
+ CHChartPDFView.h
  growth-charts-helper
  
  Created by Pascal Pfiffner on 12/18/12.
@@ -20,24 +20,19 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Quartz/Quartz.h>
 
 @class CHChart;
-@class CHChartPDFView;
-@class CHDropView;
 
 
 /**
- *	The window controller for our document.
+ *	Top level object to display a PDF chart.
  */
-@interface CHWindowController : NSWindowController <NSSplitViewDelegate>
+@interface CHChartPDFView : PDFView
 
-@property (nonatomic, readonly, strong) CHChart *chart;
-@property (nonatomic, readonly, strong) CHChartPDFView *pdf;
+@property (nonatomic, strong) CHChart *chart;
 
-@property (nonatomic, weak) IBOutlet NSView *leftPane;
-@property (nonatomic, weak) IBOutlet NSView *rightPane;
-@property (nonatomic, strong) IBOutlet CHDropView *dropWell;
+- (void)layoutSubviews;
 
 
 @end

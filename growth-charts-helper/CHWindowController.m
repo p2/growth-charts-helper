@@ -22,14 +22,86 @@
 
 #import "CHWindowController.h"
 #import "CHDocument.h"
+#import "CHChartPDFView.h"
+#import "CHDropView.h"
 
 
 @interface CHWindowController ()
+
+@property (nonatomic, readwrite, strong) CHChartPDFView *pdf;
+
+- (void)loadPDFAt:(NSURL *)url;
+- (void)didDropFiles:(NSNotification *)notification;
 
 @end
 
 
 @implementation CHWindowController
+
+
+#pragma mark - View Handling
+- (void)awakeFromNib
+{
+	// setup drop area
+	_dropWell.acceptedTypes = [NSSet setWithObject:NSPasteboardTypePDF];
+    [_dropWell registerForDraggedTypes:@[NSFilenamesPboardType]];
+	
+	// does our file have a PDF?
+	[self loadPDFAt:[((CHDocument *)self.document) pdfWithSameName]];
+	
+	// register for notifications
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didDropFiles:) name:CHDropViewDroppedItemsNotificationName object:nil];
+}
+
+- (void)didDropFiles:(NSNotification *)notification
+{
+	NSArray *items = [[notification userInfo] objectForKey:CHDropViewDroppedItemsKey];
+	if (1 == [items count]) {
+		NSPasteboardItem *item = [items lastObject];
+		NSString *urlString = [item stringForType:(NSString *)kUTTypeFileURL];
+		NSURL *url = [NSURL URLWithString:urlString];
+		
+		[self loadPDFAt:url];
+	}
+	else {
+		DLog(@"We can only accept one item");
+	}
+}
+
+
+
+#pragma mark - PDF Handling
+- (void)loadPDFAt:(NSURL *)url
+{
+	DLog(@"--> %@", url);
+	if (!url) {
+		return;
+	}
+	if ([_pdf.document.documentURL isEqual:url]) {
+		DLog(@"Already loaded");
+		return;
+	}
+	
+	[_pdf removeFromSuperview];
+	
+	// create the PDF doc view
+	self.pdf = [CHChartPDFView new];
+	_pdf.autoresizingMask = NSViewHeightSizable | NSViewWidthSizable;
+	[_pdf setAllowsDragging:NO];
+	//[_pdf setAutoScales:YES];
+	[_pdf setDisplaysPageBreaks:NO];		// if we set this to YES, PDFKit adds a nice border around the page which offsets the actual PDF page and our areas are not correctly aligned
+		
+	PDFDocument *pdfDoc = [[PDFDocument alloc] initWithURL:url];
+    [_pdf setDocument:pdfDoc];
+	_pdf.chart = self.chart;
+	
+	// add as subview
+	_pdf.frame = _leftPane.bounds;
+	[_dropWell removeFromSuperview];
+	[_leftPane addSubview:_pdf];
+	[_pdf layoutSubviews];
+}
+
 
 
 #pragma mark - Properties
@@ -43,7 +115,7 @@
 #pragma mark - Split View Delegate
 - (BOOL)splitView:(NSSplitView *)splitView shouldAdjustSizeOfSubview:(NSView *)subview
 {
-	return ([[splitView subviews] lastObject] != subview);
+	return (_rightPane != subview);
 }
 
 - (CGFloat)splitView:(NSSplitView *)splitView constrainSplitPosition:(CGFloat)proposedPosition ofSubviewAt:(NSInteger)dividerIndex

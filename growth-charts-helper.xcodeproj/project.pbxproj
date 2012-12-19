@@ -25,6 +25,9 @@
 		EEEB2DD61680F1E0004DC719 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEEB2DD51680F1E0004DC719 /* QuartzCore.framework */; };
 		EEEB2DD91680FA96004DC719 /* CHWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DD81680FA95004DC719 /* CHWindowController.m */; };
 		EEEB2DDC1680FFC7004DC719 /* CHEnumToNumberTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DDB1680FFC7004DC719 /* CHEnumToNumberTransformer.m */; };
+		EEEB2DE016810423004DC719 /* CHChartPDFView.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DDF16810422004DC719 /* CHChartPDFView.m */; };
+		EEEB2DE21681047B004DC719 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEEB2DE11681047B004DC719 /* Quartz.framework */; };
+		EEEB2DE51681075A004DC719 /* CHDropView.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DE41681075A004DC719 /* CHDropView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +68,11 @@
 		EEEB2DD81680FA95004DC719 /* CHWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHWindowController.m; sourceTree = "<group>"; };
 		EEEB2DDA1680FFC7004DC719 /* CHEnumToNumberTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHEnumToNumberTransformer.h; sourceTree = "<group>"; };
 		EEEB2DDB1680FFC7004DC719 /* CHEnumToNumberTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHEnumToNumberTransformer.m; sourceTree = "<group>"; };
+		EEEB2DDE16810422004DC719 /* CHChartPDFView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHChartPDFView.h; sourceTree = "<group>"; };
+		EEEB2DDF16810422004DC719 /* CHChartPDFView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHChartPDFView.m; sourceTree = "<group>"; };
+		EEEB2DE11681047B004DC719 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		EEEB2DE31681075A004DC719 /* CHDropView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHDropView.h; sourceTree = "<group>"; };
+		EEEB2DE41681075A004DC719 /* CHDropView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHDropView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEEB2DE21681047B004DC719 /* Quartz.framework in Frameworks */,
 				EEEB2DD61680F1E0004DC719 /* QuartzCore.framework in Frameworks */,
 				EEEB2D761680E014004DC719 /* Cocoa.framework in Frameworks */,
 			);
@@ -83,6 +92,7 @@
 		EEEB2D661680E014004DC719 = {
 			isa = PBXGroup;
 			children = (
+				EEEB2DE11681047B004DC719 /* Quartz.framework */,
 				EEEB2DD51680F1E0004DC719 /* QuartzCore.framework */,
 				EEEB2D7B1680E014004DC719 /* growth-charts-helper */,
 				EEEB2D741680E014004DC719 /* Frameworks */,
@@ -125,6 +135,8 @@
 				EEEB2DD71680FA95004DC719 /* CHWindowController.h */,
 				EEEB2DD81680FA95004DC719 /* CHWindowController.m */,
 				EEEB2D8A1680E014004DC719 /* CHDocument.xib */,
+				EEEB2DDE16810422004DC719 /* CHChartPDFView.h */,
+				EEEB2DDF16810422004DC719 /* CHChartPDFView.m */,
 				EEEB2DD21680EE70004DC719 /* CHChartAreaView.h */,
 				EEEB2DD31680EE70004DC719 /* CHChartAreaView.m */,
 				EEEB2DB91680EA29004DC719 /* FromCharts */,
@@ -173,6 +185,8 @@
 		EEEB2DDD168100EA004DC719 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				EEEB2DE31681075A004DC719 /* CHDropView.h */,
+				EEEB2DE41681075A004DC719 /* CHDropView.m */,
 				EEEB2DDA1680FFC7004DC719 /* CHEnumToNumberTransformer.h */,
 				EEEB2DDB1680FFC7004DC719 /* CHEnumToNumberTransformer.m */,
 			);
@@ -257,6 +271,8 @@
 				EEEB2DD41680EE70004DC719 /* CHChartAreaView.m in Sources */,
 				EEEB2DD91680FA96004DC719 /* CHWindowController.m in Sources */,
 				EEEB2DDC1680FFC7004DC719 /* CHEnumToNumberTransformer.m in Sources */,
+				EEEB2DE016810423004DC719 /* CHChartPDFView.m in Sources */,
+				EEEB2DE51681075A004DC719 /* CHDropView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

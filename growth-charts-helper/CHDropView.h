@@ -1,5 +1,5 @@
 /*
- CHDocumentController.h
+ CHDropView.h
  growth-charts-helper
  
  Created by Pascal Pfiffner on 12/18/12.
@@ -22,22 +22,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class CHChart;
-@class CHChartPDFView;
-@class CHDropView;
-
+extern NSString *const CHDropViewDroppedItemsNotificationName;
+extern NSString *const CHDropViewDroppedItemsKey;
 
 /**
- *	The window controller for our document.
+ *	View accepting a drop action.
  */
-@interface CHWindowController : NSWindowController <NSSplitViewDelegate>
+@interface CHDropView : NSBox
 
-@property (nonatomic, readonly, strong) CHChart *chart;
-@property (nonatomic, readonly, strong) CHChartPDFView *pdf;
-
-@property (nonatomic, weak) IBOutlet NSView *leftPane;
-@property (nonatomic, weak) IBOutlet NSView *rightPane;
-@property (nonatomic, strong) IBOutlet CHDropView *dropWell;
+@property (nonatomic, copy) NSSet *acceptedTypes;			///< Accepted drop UTIs
+@property (nonatomic, assign) BOOL acceptMultiple;
+@property (nonatomic, assign) BOOL highlighted;
 
 
 @end

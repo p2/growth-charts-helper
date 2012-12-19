@@ -41,6 +41,28 @@
 
 
 
+#pragma mark - Chart Handling
+/**
+ *  When loading a JSON, looks if there is a PDF with the same name in that directory, and returns the URL.
+ */
+- (NSURL *)pdfWithSameName
+{
+	if (!_chart) {
+		return nil;
+	}
+	
+	NSString *fileName = [[self.fileURL lastPathComponent] stringByDeletingPathExtension];
+	NSString *pdfName = [fileName stringByAppendingString:@".pdf"];
+	NSString *pdfPath = [[[self.fileURL path] stringByDeletingLastPathComponent] stringByAppendingPathComponent:pdfName];
+	NSFileManager *fm = [NSFileManager defaultManager];
+	if ([fm fileExistsAtPath:pdfPath]) {
+		return [NSURL fileURLWithPath:pdfPath];
+	}
+	return nil;
+}
+
+
+
 #pragma mark - File Reading and Writing
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
@@ -54,11 +76,16 @@
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
-	DLog(@"type: %@", typeName);
+	if (![@"DocumentType" isEqualToString:typeName]) {
+		return NO;
+	}
+	
+	self.chart = nil;
 	NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:outError];
 	if ([dict isKindOfClass:[NSDictionary class]]) {
 		self.chart = [CHChart newFromJSONObject:dict];
 	}
+	
 	return (nil != _chart);
 }
 

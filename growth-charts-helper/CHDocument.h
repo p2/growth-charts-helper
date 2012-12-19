@@ -18,5 +18,7 @@
 
 @property (nonatomic, strong) CHChart *chart;
 
+- (NSURL *)pdfWithSameName;
+
 
 @end

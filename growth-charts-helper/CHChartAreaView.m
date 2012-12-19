@@ -47,8 +47,8 @@
 		
 //		self.clearsContextBeforeDrawing = NO;
 //		self.contentMode = UIViewContentModeRedraw;
-		((CATiledLayer *)self.layer).levelsOfDetail = 4;
-		((CATiledLayer *)self.layer).levelsOfDetailBias = 3;			// we use (levelsOfDetail - 1) because we only need more detail when zoomed in, no less details when zoomed out
+//		((CATiledLayer *)self.layer).levelsOfDetail = 4;
+//		((CATiledLayer *)self.layer).levelsOfDetailBias = 3;			// we use (levelsOfDetail - 1) because we only need more detail when zoomed in, no less details when zoomed out
 	}
 	return self;
 }
@@ -63,8 +63,7 @@
 	// rect to origin and size
 	NSString *rectString = [dict objectForKey:@"rect"];
 	if ([rectString isKindOfClass:[NSString class]]) {
-		DLog(@"Should use %@", rectString);
-		CGRect rect = CGRectZero;//CGRectFromString(rectString);
+		NSRect rect = NSRectFromString(rectString);
 		self.origin = rect.origin;
 		self.size = rect.size;
 	}
@@ -81,8 +80,7 @@
 		if ([points count] > 2) {
 			CGMutablePathRef outlinePath = nil;
 			for (NSString *point in points) {
-				DLog(@"Should use %@", point);
-				CGPoint p = CGPointZero;//CGPointFromString(point);
+				NSPoint p = NSPointFromString(point);
 				if (!outlinePath) {
 					outlinePath = CGPathCreateMutable();
 					CGPathMoveToPoint(outlinePath, NULL, p.x, p.y);
@@ -188,7 +186,8 @@
 		CGRect appliedRect = targetRect;
 		
 		appliedRect.origin.x += _origin.x * appliedRect.size.width;
-		appliedRect.origin.y += _origin.y * appliedRect.size.height;
+		//appliedRect.origin.y += _origin.y * appliedRect.size.height;
+		appliedRect.origin.y += (1.f - _origin.y) * appliedRect.size.height - (_size.height * appliedRect.size.height);
 		appliedRect.size.width *= _size.width;
 		appliedRect.size.height *= _size.height;
 		
@@ -287,6 +286,12 @@
 
 
 #pragma mark - Drawing
+- (void)drawRect:(NSRect)dirtyRect
+{
+	[[NSColor colorWithDeviceRed:1.f green:0.f blue:0.f alpha:0.25f] setFill];
+	[NSBezierPath fillRect:self.bounds];
+}
+
 /**
  *  This is the drawing method we use, "drawRect:" is the wrong one if you intend to create subclasses!
  */
@@ -400,12 +405,7 @@ static NSMutableDictionary *registeredAreaClasses = nil;
 
 + (Class)registeredClassForType:(NSString *)aType
 {
-	if (registeredAreaClasses) {
-		return [registeredAreaClasses objectForKey:aType];
-	}
-	
-	DLog(@"No class registered for type \"%@\"", aType);
-	return nil;
+	return self;
 }
 
 
