@@ -40,8 +40,14 @@
 @property (nonatomic, weak) IBOutlet NSView *leftPane;
 @property (nonatomic, weak) IBOutlet NSView *rightPane;
 @property (nonatomic, strong) IBOutlet CHDropView *dropWell;
+@property (nonatomic, weak) IBOutlet NSTextField *pdfFoundLabel;
+@property (nonatomic, weak) IBOutlet NSButton *pdfFoundButton;
 @property (nonatomic, weak) IBOutlet NSTabView *optionsBox;
 @property (nonatomic, weak) IBOutlet NSBox *hierarchyBox;
+
+- (void)loadPDFAt:(NSURL *)url;
+- (IBAction)handleFoundPDF:(id)sender;
+- (void)unloadPDF:(id)sender;
 
 
 @end

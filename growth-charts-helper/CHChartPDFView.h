@@ -35,7 +35,6 @@
 @property (nonatomic, strong) CHChartAreaView *activeArea;
 
 - (void)layoutSubviews;
-
 - (void)didGetClicked:(CHChartAreaView *)areaView;
 
 

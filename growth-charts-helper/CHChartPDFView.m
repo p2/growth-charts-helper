@@ -106,9 +106,9 @@
 
 - (void)layoutSubviews
 {
-	// realign zoom buttons
 	NSSize mySize = self.bounds.size;
 	
+	// realign zoom buttons
 	NSRect zoomFrame = _zoomIn.frame;
 	zoomFrame.origin.x = mySize.width - zoomFrame.size.width;
 	zoomFrame.origin.y = mySize.height - zoomFrame.size.height;
@@ -168,7 +168,7 @@
 {
 	if (!_zoomIn) {
 		self.zoomIn = [[NSButton alloc] initWithFrame:NSMakeRect(0.f, 0.f, 39.f, 38.f)];
-		//[_zoomIn setAutoresizingMask:NSViewMinXMargin];		// no luck, overriding setFrame:
+		//[_zoomIn setAutoresizingMask:NSViewMinXMargin];		// no luck, utilizing layoutSubviews
 		[_zoomIn setButtonType:NSMomentaryPushInButton];
 		[_zoomIn setBezelStyle:NSCircularBezelStyle];
 		[_zoomIn setTitle:@"+"];
@@ -183,7 +183,7 @@
 {
 	if (!_zoomOut) {
 		self.zoomOut = [[NSButton alloc] initWithFrame:NSMakeRect(0.f, 0.f, 39.f, 38.f)];
-		//[_zoomIn setAutoresizingMask:NSViewMinXMargin];		// no luck, overriding setFrame:
+		//[_zoomIn setAutoresizingMask:NSViewMinXMargin];
 		[_zoomOut setButtonType:NSMomentaryPushInButton];
 		[_zoomOut setBezelStyle:NSCircularBezelStyle];
 		[_zoomOut setTitle:@"-"];

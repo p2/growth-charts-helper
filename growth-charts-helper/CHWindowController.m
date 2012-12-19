@@ -37,8 +37,9 @@
 
 @property (nonatomic, strong) NSMutableArray *currentAreaStack;
 
-- (void)loadPDFAt:(NSURL *)url;
+- (CHDocument *)pdfDocument;
 - (void)didDropFiles:(NSNotification *)notification;
+- (void)updateFoundPDFStatus;
 
 @end
 
@@ -54,7 +55,9 @@
     [_dropWell registerForDraggedTypes:@[NSFilenamesPboardType]];
 	
 	// does our file have a PDF?
-	[self loadPDFAt:[((CHDocument *)self.document) pdfWithSameName]];
+	NSURL *url = [[self pdfDocument] pdfWithSameName];
+	[self loadPDFAt:url];
+	[self updateFoundPDFStatus];
 	
 	// register for notifications
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didDropFiles:) name:CHDropViewDroppedItemsNotificationName object:nil];
@@ -90,20 +93,17 @@
 	}
 	
 	// get rid of the old view
-	if (_pdf) {
-		[_pdf removeFromSuperview];
-		[_pdf removeObserver:self forKeyPath:@"activeArea"];
-	}
+	[self unloadPDF:nil];
 	
 	// create the PDF doc view
 	self.pdf = [CHChartPDFView new];
 	_pdf.autoresizingMask = NSViewHeightSizable | NSViewWidthSizable;
-	[_pdf setAllowsDragging:NO];
-	//[_pdf setAutoScales:YES];
-	[_pdf setDisplaysPageBreaks:NO];		// if we set this to YES, PDFKit adds a nice border around the page which offsets the actual PDF page and our areas are not correctly aligned
+	_pdf.allowsDragging = NO;
+	_pdf.autoScales = NO;
+	_pdf.displaysPageBreaks = NO;		// if we set this to YES, PDFKit adds a nice border around the page which offsets the actual PDF page and our areas are not correctly aligned
 		
 	PDFDocument *pdfDoc = [[PDFDocument alloc] initWithURL:url];
-    [_pdf setDocument:pdfDoc];
+	_pdf.document = pdfDoc;
 	_pdf.chart = self.chart;
 	
 	// add as subview
@@ -114,14 +114,77 @@
 	
 	// we need to observe the active area
 	[_pdf addObserver:self forKeyPath:@"activeArea" options:0 context:NULL];
+	
+	// update button
+	_pdfFoundButton.title = @"Unload PDF";
+	[_pdfFoundButton setEnabled:YES];
+}
+
+- (IBAction)handleFoundPDF:(id)sender
+{
+	// got it loaded already, unload
+	if (_pdf) {
+		[self unloadPDF:sender];
+		return;
+	}
+	
+	// none yet, load
+	NSURL *url = [[self pdfDocument] pdfWithSameName];
+	if (!url) {
+		_pdfFoundLabel.stringValue = @"Drop the respective PDF to the left";
+		[_pdfFoundButton setEnabled:NO];
+		return;
+	}
+	
+	[self loadPDFAt:url];
+}
+
+- (void)unloadPDF:(id)sender
+{
+	// remove PDF
+	if (_pdf) {
+		[_pdf removeObserver:self forKeyPath:@"activeArea"];
+		[_pdf removeFromSuperview];
+		self.pdf = nil;
+	}
+	
+	// update button and add drop well
+	[self updateFoundPDFStatus];
+	
+	NSSize targetSize = _leftPane.bounds.size;
+	NSRect dropFrame = _dropWell.frame;
+	dropFrame.origin.x = roundf((targetSize.width - dropFrame.size.width) / 2);
+	dropFrame.origin.y = roundf((targetSize.height - dropFrame.size.height) / 2);
+	_dropWell.frame = dropFrame;
+	[_leftPane addSubview:_dropWell];
+}
+
+- (void)updateFoundPDFStatus
+{
+	NSURL *url = [[self pdfDocument] pdfWithSameName];
+	if (!url) {
+		_pdfFoundLabel.stringValue = @"Drop the respective PDF to the left";
+		_pdfFoundButton.title = @"Load PDF";
+		[_pdfFoundButton setEnabled:NO];
+	}
+	else {
+		_pdfFoundLabel.stringValue = @"A PDF with the same name has been found";
+		_pdfFoundButton.title = _pdf ? @"Unload PDF" : @"Load PDF";
+		[_pdfFoundButton setEnabled:YES];
+	}
 }
 
 
 
 #pragma mark - Chart Handling
+- (CHDocument *)pdfDocument
+{
+	return (CHDocument *)self.document;
+}
+
 - (CHChart *)chart
 {
-	return ((CHDocument *)self.document).chart;
+	return [self pdfDocument].chart;
 }
 
 - (void)setActiveArea:(CHChartArea *)activeArea
