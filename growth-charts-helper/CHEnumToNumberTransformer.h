@@ -1,5 +1,5 @@
 /*
- CHGenderToNumberTransformer.h
+ CHEnumToNumberTransformer.h
  growth-charts-helper
  
  Created by Pascal Pfiffner on 12/18/12.

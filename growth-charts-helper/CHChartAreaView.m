@@ -21,6 +21,8 @@
  */
 
 #import "CHChartAreaView.h"
+#import "CHChartArea.h"
+#import "CHChartPDFView.h"
 
 
 @interface CHChartAreaView ()
@@ -54,23 +56,24 @@
 }
 
 
+- (void)setArea:(CHChartArea *)area
+{
+	if (area != _area) {
+		_area = area;
+		
+		// set some properties
+		self.origin = area.frame.origin;
+		self.size = area.frame.size;
+	}
+}
+
+
 /**
  *  The chart area model keeps a dictionary around, subclasses of the view can override this method to receive more properties for its configuration.
  *  Don't forget to call super, the base implementation assigns origin and size!
  */
 - (void)setFromDictionary:(NSDictionary *)dict
 {
-	// rect to origin and size
-	NSString *rectString = [dict objectForKey:@"rect"];
-	if ([rectString isKindOfClass:[NSString class]]) {
-		NSRect rect = NSRectFromString(rectString);
-		self.origin = rect.origin;
-		self.size = rect.size;
-	}
-	else if (rectString) {
-		DLog(@"\"rect\" must be a NSString, but I got a %@, discarding", NSStringFromClass([rectString class]));
-	}
-	
 	// outline path
 	NSString *outlineString = [dict objectForKey:@"outline"];
 	if ([outlineString isKindOfClass:[NSString class]]) {
@@ -199,26 +202,9 @@
 	
 	// position subareas
 	for (CHChartAreaView *area in _areas) {
+		area.pageView = _pageView;
 		[area positionInFrame:self.bounds onView:self pageSize:pageSize];
 	}
-}
-
-
-/**
- *  Overridden so we can adjust our tile size if needed
- */
-- (void)setFrame:(CGRect)aFrame
-{
-	// re-cache all data points if the frame SIZE changed
-	if (!CGSizeEqualToSize(aFrame.size, [self frame].size)) {
-		CGFloat screenScale = 1.f;	//[[UIScreen mainScreen] scale];
-		CGFloat max = fmaxf(aFrame.size.width * screenScale, aFrame.size.height * screenScale);
-		CGFloat tileWidth = ((max < 512.f) ? 512.f : 1024.f);
-		
-		((CATiledLayer *)self.layer).tileSize = CGSizeMake(tileWidth, tileWidth);
-		//[self setNeedsDisplay];
-	}
-	[super setFrame:aFrame];
 }
 
 /**
@@ -286,32 +272,28 @@
 
 
 #pragma mark - Drawing
-- (void)drawRect:(NSRect)dirtyRect
+- (void)setActive:(BOOL)flag
 {
-	[[NSColor colorWithDeviceRed:1.f green:0.f blue:0.f alpha:0.25f] setFill];
-	[NSBezierPath fillRect:self.bounds];
+	if (flag != _active) {
+		_active = flag;
+		[self setNeedsDisplay:YES];
+	}
 }
 
-/**
- *  This is the drawing method we use, "drawRect:" is the wrong one if you intend to create subclasses!
- */
-- (void)drawLayer:(CATiledLayer *)aLayer inContext:(CGContextRef)ctx
+
+- (void)drawRect:(NSRect)dirtyRect
 {
-	CGRect clip = CGContextGetClipBoundingBox(ctx);
+	[NSGraphicsContext saveGraphicsState];
 	
-	// fill background area
-	CGContextSaveGState(ctx);
-//	CGContextSetFillColorWithColor(ctx, [self.backgroundColor CGColor]);
-	CGContextFillRect(ctx, CGRectIntersection(clip, self.bounds));
-	CGContextRestoreGState(ctx);
+	if (_active) {
+		[[NSColor colorWithDeviceRed:0.f green:1.f blue:0.f alpha:0.25f] setFill];
+	}
+	else {
+		[[NSColor colorWithDeviceRed:0.f green:0.f blue:1.f alpha:0.25f] setFill];
+	}
 	
-	// debug: fill bounding box
-#if kCHChartAreaViewDebugDrawing
-	CGContextSaveGState(ctx);
-	CGContextSetFillColorWithColor(ctx, [[[UIColor greenColor] colorWithAlphaComponent:0.25f] CGColor]);
-	CGContextFillRect(ctx, CGRectIntersection(clip, [self boundingBox]));
-	CGContextRestoreGState(ctx);
-#endif
+	[NSBezierPath fillRect:self.bounds];
+	[NSGraphicsContext restoreGraphicsState];
 }
 
 
@@ -367,42 +349,26 @@
 }
 
 
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	//DLog(@"%@ -- %@", self, theEvent);
+}
+
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+	if (_active) {
+		
+	}
+}
+
+- (void)mouseUp:(NSEvent *)theEvent
+{
+	[_pageView didGetClicked:self];
+}
+
+
 
 #pragma mark - Class Registration
-/**
- *  You MUST include this in subclasses if you want your subclass to automatically be used for specific area types
- */
-+ (void)load
-{
-	[CHChartAreaView registerClass:self forType:nil];
-}
-
-
-static NSMutableDictionary *registeredAreaClasses = nil;
-
-/**
- *  Registeres the given class to represent areas of given type
- *  @return A bool indicating whether the class was successfully registered
- */
-+ (BOOL)registerClass:(Class)areaClass forType:(NSString *)aType
-{
-	if ([aType length] < 1) {
-		return NO;
-	}
-	
-	// got a type, register if no type is yet registered for that
-	if (!registeredAreaClasses) {
-		registeredAreaClasses = [NSMutableDictionary new];
-	}
-	else if ([registeredAreaClasses objectForKey:aType]) {
-		DLog(@"The class \"%@\" already registered for type \"%@\"", NSStringFromClass([registeredAreaClasses objectForKey:aType]), aType);
-		return NO;
-	}
-	
-	[registeredAreaClasses setObject:areaClass forKey:aType];
-	return YES;
-}
-
 + (Class)registeredClassForType:(NSString *)aType
 {
 	return self;
@@ -434,7 +400,7 @@ static NSMutableDictionary *registeredAreaClasses = nil;
 #pragma mark - Utilities
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%@ <%p> {%@,%@}, %d sub-areas", NSStringFromClass([self class]), self, NSStringFromCGPoint(_origin), NSStringFromCGSize(_size), [_areas count]];
+	return [NSString stringWithFormat:@"%@ <%p> {%@,%@}, %d sub-areas", NSStringFromClass([self class]), self, NSStringFromCGPoint(_origin), NSStringFromCGSize(_size), (int)[_areas count]];
 }
 
 

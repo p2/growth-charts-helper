@@ -26,6 +26,8 @@
 
 @interface CHChartArea ()
 
+@property (nonatomic, readwrite, assign) BOOL topmost;
+
 @end
 
 
@@ -36,6 +38,7 @@
 {
 	CHChartArea *this = [self new];
 	this.chart = chart;
+	this.topmost = YES;
 	[this setFromDictionary:dict];
 	
 	return this;
@@ -75,7 +78,58 @@
 		[muteDict removeObjectForKey:@"page"];
 	}
 	
-	// add sub-areas
+	// frame
+	NSString *rectString = [dict objectForKey:@"rect"];
+	if ([rectString isKindOfClass:[NSString class]]) {
+		NSRect rect = NSRectFromString(rectString);
+		self.frame = CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+	}
+	else if (rectString) {
+		DLog(@"\"rect\" must be a NSString, but I got a %@, discarding", NSStringFromClass([rectString class]));
+	}
+	
+	// fonts
+	NSString *aFontName = [dict objectForKey:@"fontName"];
+	if ([aFontName isKindOfClass:[NSString class]]) {
+		self.fontName = aFontName;
+	}
+	NSNumber *aFontSize = [dict objectForKey:@"fontSize"];
+	if ([aFontSize isKindOfClass:[NSNumber class]]) {
+		self.fontSize = aFontSize;
+	}
+	else if (aFontSize) {
+		DLog(@"\"fontSize\" must be a number, but I got a %@, discarding", NSStringFromClass([aFontSize class]));
+	}
+	
+	// data and value areas
+	NSString *aDataType = [dict objectForKey:@"dataType"];
+	if ([aDataType isKindOfClass:[NSString class]]) {
+		self.dataType = aDataType;
+	}
+	
+	// plot areas
+	NSDictionary *axesDict = [dict objectForKey:@"axes"];
+	if ([axesDict isKindOfClass:[NSDictionary class]]) {
+		
+		// x
+		NSDictionary *xAxisDict = [axesDict objectForKey:@"x"];
+		self.xAxisUnitName = [xAxisDict objectForKey:@"unit"];
+		self.xAxisDataType = [xAxisDict objectForKey:@"datatype"];
+		self.xAxisFrom = [NSDecimalNumber decimalNumberWithString:[xAxisDict objectForKey:@"from"]];
+		self.xAxisTo = [NSDecimalNumber decimalNumberWithString:[xAxisDict objectForKey:@"to"]];
+		
+		// y
+		NSDictionary *yAxisDict = [axesDict objectForKey:@"y"];
+		self.yAxisUnitName = [yAxisDict objectForKey:@"unit"];
+		self.yAxisDataType = [yAxisDict objectForKey:@"datatype"];
+		self.yAxisFrom = [NSDecimalNumber decimalNumberWithString:[yAxisDict objectForKey:@"from"]];
+		self.yAxisTo = [NSDecimalNumber decimalNumberWithString:[yAxisDict objectForKey:@"to"]];
+	}
+	else if ([@"plot" isEqualToString:_type]) {
+		DLog(@"This plot area does not have axes!  %@", dict);
+	}
+	
+	// ** sub-areas
 	NSArray *areas = [dict objectForKey:@"areas"];
 	if ([areas isKindOfClass:[NSArray class]] && [areas count] > 0) {
 		NSMutableArray *myAreas = [NSMutableArray arrayWithCapacity:[areas count]];
@@ -85,6 +139,7 @@
 			if ([areaDict isKindOfClass:[NSDictionary class]]) {
 				CHChartArea *area = [CHChartArea newAreaOnChart:_chart withDictionary:areaDict];
 				if (area) {
+					area.topmost = NO;
 					area.page = self.page;
 					[myAreas addObject:area];
 				}
@@ -114,8 +169,8 @@
 		return nil;
 	}
 	
-	// all properties
-	[view setFromDictionary:_dictionary];
+	// update properties
+	view.area = self;
 	
 	// sub-areas
 	if ([_areas count] > 0) {
@@ -133,9 +188,58 @@
 
 
 #pragma mark - Utilities
+- (CGFloat)frameOriginX
+{
+	return _frame.origin.x;
+}
+
+- (void)setFrameOriginX:(CGFloat)x
+{
+	CGRect fr = _frame;
+	fr.origin.x = x;
+	self.frame = fr;
+}
+
+- (CGFloat)frameOriginY
+{
+	return _frame.origin.y;
+}
+
+- (void)setFrameOriginY:(CGFloat)y
+{
+	CGRect fr = _frame;
+	fr.origin.y = y;
+	self.frame = fr;
+}
+
+- (CGFloat)frameSizeWidth
+{
+	return _frame.size.width;
+}
+
+- (void)setFrameSizeWidth:(CGFloat)w
+{
+	CGRect fr = _frame;
+	fr.size.width = w;
+	self.frame = fr;
+}
+
+- (CGFloat)frameSizeHeight
+{
+	return _frame.size.height;
+}
+
+- (void)setFrameSizeHeight:(CGFloat)h
+{
+	CGRect fr = _frame;
+	fr.size.height = h;
+	self.frame = fr;
+}
+
+
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%@ <%p> type \"%@\", %d sub-areas", NSStringFromClass([self class]), self, _type, [_areas count]];
+	return [NSString stringWithFormat:@"%@ <%p> type \"%@\", %d sub-areas", NSStringFromClass([self class]), self, _type, (int)[_areas count]];
 }
 
 

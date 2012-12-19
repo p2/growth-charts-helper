@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EEAECBFE16815E2F00E8ABE1 /* CHRectToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = EEAECBFD16815E2F00E8ABE1 /* CHRectToStringTransformer.m */; };
+		EEAECC1716816B7800E8ABE1 /* CHFloatToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = EEAECC1616816B7800E8ABE1 /* CHFloatToStringTransformer.m */; };
+		EEAECC1A16816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = EEAECC1916816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m */; };
 		EEEB2D761680E014004DC719 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEEB2D751680E014004DC719 /* Cocoa.framework */; };
 		EEEB2D801680E014004DC719 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = EEEB2D7E1680E014004DC719 /* InfoPlist.strings */; };
 		EEEB2D821680E014004DC719 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2D811680E014004DC719 /* main.m */; };
@@ -31,6 +34,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EEAECBFC16815E2F00E8ABE1 /* CHRectToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHRectToStringTransformer.h; sourceTree = "<group>"; };
+		EEAECBFD16815E2F00E8ABE1 /* CHRectToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHRectToStringTransformer.m; sourceTree = "<group>"; };
+		EEAECC1516816B7800E8ABE1 /* CHFloatToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHFloatToStringTransformer.h; sourceTree = "<group>"; };
+		EEAECC1616816B7800E8ABE1 /* CHFloatToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHFloatToStringTransformer.m; sourceTree = "<group>"; };
+		EEAECC1816816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHDecimalNumberToStringTransformer.h; sourceTree = "<group>"; };
+		EEAECC1916816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHDecimalNumberToStringTransformer.m; sourceTree = "<group>"; };
 		EEEB2D711680E014004DC719 /* growth-charts-helper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "growth-charts-helper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEEB2D751680E014004DC719 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		EEEB2D781680E014004DC719 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -132,9 +141,9 @@
 			children = (
 				EEEB2D871680E014004DC719 /* CHDocument.h */,
 				EEEB2D881680E014004DC719 /* CHDocument.m */,
+				EEEB2D8A1680E014004DC719 /* CHDocument.xib */,
 				EEEB2DD71680FA95004DC719 /* CHWindowController.h */,
 				EEEB2DD81680FA95004DC719 /* CHWindowController.m */,
-				EEEB2D8A1680E014004DC719 /* CHDocument.xib */,
 				EEEB2DDE16810422004DC719 /* CHChartPDFView.h */,
 				EEEB2DDF16810422004DC719 /* CHChartPDFView.m */,
 				EEEB2DD21680EE70004DC719 /* CHChartAreaView.h */,
@@ -189,6 +198,12 @@
 				EEEB2DE41681075A004DC719 /* CHDropView.m */,
 				EEEB2DDA1680FFC7004DC719 /* CHEnumToNumberTransformer.h */,
 				EEEB2DDB1680FFC7004DC719 /* CHEnumToNumberTransformer.m */,
+				EEAECC1516816B7800E8ABE1 /* CHFloatToStringTransformer.h */,
+				EEAECC1616816B7800E8ABE1 /* CHFloatToStringTransformer.m */,
+				EEAECC1816816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.h */,
+				EEAECC1916816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m */,
+				EEAECBFC16815E2F00E8ABE1 /* CHRectToStringTransformer.h */,
+				EEAECBFD16815E2F00E8ABE1 /* CHRectToStringTransformer.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -273,6 +288,9 @@
 				EEEB2DDC1680FFC7004DC719 /* CHEnumToNumberTransformer.m in Sources */,
 				EEEB2DE016810423004DC719 /* CHChartPDFView.m in Sources */,
 				EEEB2DE51681075A004DC719 /* CHDropView.m in Sources */,
+				EEAECBFE16815E2F00E8ABE1 /* CHRectToStringTransformer.m in Sources */,
+				EEAECC1716816B7800E8ABE1 /* CHFloatToStringTransformer.m in Sources */,
+				EEAECC1A16816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

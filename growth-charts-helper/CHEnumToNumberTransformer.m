@@ -1,5 +1,5 @@
 /*
- CHGenderToNumberTransformer.m
+ CHEnumToNumberTransformer.m
  growth-charts-helper
  
  Created by Pascal Pfiffner on 12/18/12.
@@ -23,22 +23,17 @@
 #import "CHEnumToNumberTransformer.h"
 
 
-@interface CHEnumToNumberTransformer ()
-
-@end
-
-
 @implementation CHEnumToNumberTransformer
 
 
 + (Class)transformedValueClass
 {
-    return [NSNumber class];
+	return [NSNumber class];
 }
 
 + (BOOL)allowsReverseTransformation
 {
-    return YES;
+	return YES;
 }
 
 /**
@@ -54,7 +49,7 @@
  */
 - (id)reverseTransformedValue:(id)value
 {
-    return value;
+	return value;
 }
 
 

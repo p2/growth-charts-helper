@@ -1,5 +1,5 @@
 /*
- CHDocumentController.h
+ CHRectToStringTransformer.m
  growth-charts-helper
  
  Created by Pascal Pfiffner on 12/18/12.
@@ -20,28 +20,29 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#import <Cocoa/Cocoa.h>
+#import "CHRectToStringTransformer.h"
 
-@class CHChart;
-@class CHChartArea;
-@class CHChartPDFView;
-@class CHDropView;
 
+@implementation CHRectToStringTransformer
+
+
++ (Class)transformedValueClass
+{
+	return [NSString class];
+}
+
++ (BOOL)allowsReverseTransformation
+{
+	return NO;
+}
 
 /**
- *	The window controller for our document.
+ *  Since the transformer can't be fed a struct we get it packed into an NSValue.
  */
-@interface CHWindowController : NSWindowController <NSSplitViewDelegate>
-
-@property (nonatomic, readonly, strong) CHChart *chart;
-@property (nonatomic, readonly, weak) CHChartArea *activeArea;
-@property (nonatomic, readonly, strong) CHChartPDFView *pdf;
-
-@property (nonatomic, weak) IBOutlet NSView *leftPane;
-@property (nonatomic, weak) IBOutlet NSView *rightPane;
-@property (nonatomic, strong) IBOutlet CHDropView *dropWell;
-@property (nonatomic, weak) IBOutlet NSTabView *optionsBox;
-@property (nonatomic, weak) IBOutlet NSBox *hierarchyBox;
+- (id)transformedValue:(id)value
+{
+	return NSStringFromCGRect([value rectValue]);
+}
 
 
 @end

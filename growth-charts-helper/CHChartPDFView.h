@@ -23,6 +23,7 @@
 #import <Quartz/Quartz.h>
 
 @class CHChart;
+@class CHChartAreaView;
 
 
 /**
@@ -31,8 +32,11 @@
 @interface CHChartPDFView : PDFView
 
 @property (nonatomic, strong) CHChart *chart;
+@property (nonatomic, strong) CHChartAreaView *activeArea;
 
 - (void)layoutSubviews;
+
+- (void)didGetClicked:(CHChartAreaView *)areaView;
 
 
 @end

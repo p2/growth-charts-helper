@@ -158,7 +158,7 @@
 #pragma mark - Utilities
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%@ <%p> \"%@\" at %@, %d areas", NSStringFromClass([self class]), self, _name, _resourceName, [_chartAreas count]];
+	return [NSString stringWithFormat:@"%@ <%p> \"%@\" at %@, %d areas", NSStringFromClass([self class]), self, _name, _resourceName, (int)[_chartAreas count]];
 }
 
 

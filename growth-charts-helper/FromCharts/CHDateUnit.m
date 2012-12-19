@@ -27,13 +27,13 @@
 		}
 		else {
 			if (CHValueStringSizeLong == size) {
-				[parts addObject:[NSString stringWithFormat:@"%d years", comp.year]];
+				[parts addObject:[NSString stringWithFormat:@"%d years", (int)comp.year]];
 			}
 			else if (CHValueStringSizeCompact == size) {
-				[parts addObject:[NSString stringWithFormat:@"%dy", comp.year]];
+				[parts addObject:[NSString stringWithFormat:@"%dy", (int)comp.year]];
 			}
 			else {
-				[parts addObject:[NSString stringWithFormat:@"%d y", comp.year]];
+				[parts addObject:[NSString stringWithFormat:@"%d y", (int)comp.year]];
 			}
 		}
 	}
@@ -41,26 +41,26 @@
 	// months
 	if (comp.month > 0) {
 		if (CHValueStringSizeLong == size) {
-			[parts addObject:[NSString stringWithFormat:@"%d month%@", comp.month, (1 == comp.month ? @"" : @"s")]];
+			[parts addObject:[NSString stringWithFormat:@"%d month%@", (int)comp.month, (1 == comp.month ? @"" : @"s")]];
 		}
 		else if (CHValueStringSizeCompact == size) {
-			[parts addObject:[NSString stringWithFormat:@"%dm", comp.month]];
+			[parts addObject:[NSString stringWithFormat:@"%dm", (int)comp.month]];
 		}
 		else {
-			[parts addObject:[NSString stringWithFormat:@"%d mth", comp.month]];
+			[parts addObject:[NSString stringWithFormat:@"%d mth", (int)comp.month]];
 		}
 	}
 	
 	// days
 	if (comp.day > 0) {
 		if (CHValueStringSizeLong == size) {
-			[parts addObject:[NSString stringWithFormat:@"%d day%@", comp.day, (1 == comp.day ? @"" : @"s")]];
+			[parts addObject:[NSString stringWithFormat:@"%d day%@", (int)comp.day, (1 == comp.day ? @"" : @"s")]];
 		}
 		else if (CHValueStringSizeCompact == size) {
-			[parts addObject:[NSString stringWithFormat:@"%dd", comp.day]];
+			[parts addObject:[NSString stringWithFormat:@"%dd", (int)comp.day]];
 		}
 		else {
-			[parts addObject:[NSString stringWithFormat:@"%d d", comp.day]];
+			[parts addObject:[NSString stringWithFormat:@"%d d", (int)comp.day]];
 		}
 	}
 	
@@ -142,7 +142,7 @@
 	NSDate *date = [self dateValueFor:number fromDate:self.referenceDate];
 	
 	NSDateComponents *comp = [[NSCalendar currentCalendar] components:NSSecondCalendarUnit fromDate:self.referenceDate toDate:date options:0];
-	return [NSDecimalNumber decimalNumberWithString:[NSString stringWithFormat:@"%i", comp.second]];
+	return [NSDecimalNumber decimalNumberWithString:[NSString stringWithFormat:@"%d", (int)comp.second]];
 }
 
 

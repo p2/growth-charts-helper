@@ -1,5 +1,5 @@
 /*
- CHDocumentController.h
+ CHFloatToStringTransformer.h
  growth-charts-helper
  
  Created by Pascal Pfiffner on 12/18/12.
@@ -20,28 +20,12 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#import <Cocoa/Cocoa.h>
-
-@class CHChart;
-@class CHChartArea;
-@class CHChartPDFView;
-@class CHDropView;
+#import <Foundation/Foundation.h>
 
 
 /**
- *	The window controller for our document.
+ *	Transform NSNumber to NSString and vice versa.
  */
-@interface CHWindowController : NSWindowController <NSSplitViewDelegate>
-
-@property (nonatomic, readonly, strong) CHChart *chart;
-@property (nonatomic, readonly, weak) CHChartArea *activeArea;
-@property (nonatomic, readonly, strong) CHChartPDFView *pdf;
-
-@property (nonatomic, weak) IBOutlet NSView *leftPane;
-@property (nonatomic, weak) IBOutlet NSView *rightPane;
-@property (nonatomic, strong) IBOutlet CHDropView *dropWell;
-@property (nonatomic, weak) IBOutlet NSTabView *optionsBox;
-@property (nonatomic, weak) IBOutlet NSBox *hierarchyBox;
-
+@interface CHFloatToStringTransformer : NSValueTransformer
 
 @end

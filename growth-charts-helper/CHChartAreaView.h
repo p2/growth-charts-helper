@@ -24,7 +24,9 @@
 #import <QuartzCore/QuartzCore.h>
 #import "CHChart.h"
 
-#define kCHChartAreaViewDebugDrawing 0
+@class CHChartArea;
+@class CHChartPDFView;
+
 
 /**
  *  A chart area represents an area on a PDF file to draw content into.
@@ -39,12 +41,17 @@
  */
 @interface CHChartAreaView : NSView
 
+@property (nonatomic, weak) CHChartArea *area;				///< The area model that describes the receiver
+
 @property (nonatomic, assign) CGPoint origin;				///< Origin between 0 and 1 relative to its parent's grid
 @property (nonatomic, assign) CGSize size;					///< Size between 0 and 1 relative to its parent's grid
 @property (nonatomic, assign) CGPathRef outline;			///< The outline of the area. We do *not* clip to this area, but you can use it to do so.
 @property (nonatomic, assign) CGSize pageSize;				///< The size of the page we're currently displayed on, in screen pixels
 
 @property (nonatomic, copy) NSArray *areas;					///< An area can have any number of subareas
+
+@property (nonatomic, weak) CHChartPDFView *pageView;		///< The PDFView we're residing in
+@property (nonatomic, assign) BOOL active;
 
 - (void)setFromDictionary:(NSDictionary *)dict;
 
@@ -64,7 +71,6 @@
 - (BOOL)pointInside:(CGPoint)point withEvent:(NSEvent *)event;
 - (NSSet *)areasAtPoint:(CGPoint)point;
 
-+ (BOOL)registerClass:(Class)areaClass forType:(NSString *)aType;
 + (Class)registeredClassForType:(NSString *)aType;
 
 + (NSCharacterSet *)outlinePathSplitSet;

@@ -34,8 +34,29 @@
 @property (nonatomic, weak) CHChart *chart;					///< The chart to which we belong
 @property (nonatomic, copy) NSString *type;					///< The type of the area
 @property (nonatomic, copy) NSDictionary *dictionary;		///< The dictionary representation defining the receiver, kept around to spawn the view objects
-@property (nonatomic, assign) NSUInteger page;				///< 1 by default. The page number of the PDF this area resides on
 
+@property (nonatomic, assign) NSUInteger page;				///< 1 by default. The page number of the PDF this area resides on
+@property (nonatomic, assign) CGRect frame;					///< The frame as specified
+@property (nonatomic, assign) CGFloat frameOriginX;
+@property (nonatomic, assign) CGFloat frameOriginY;
+@property (nonatomic, assign) CGFloat frameSizeWidth;
+@property (nonatomic, assign) CGFloat frameSizeHeight;
+
+@property (nonatomic, copy) NSString *fontName;				///< Text areas: font name
+@property (nonatomic, strong) NSNumber *fontSize;			///< Text areas: font size
+
+@property (nonatomic, copy) NSString *dataType;				///< Value areas: data type
+
+@property (nonatomic, copy) NSString *xAxisUnitName;		///< Plot areas: X axis unit name
+@property (nonatomic, copy) NSString *xAxisDataType;		///< Plot areas: X axis data type
+@property (nonatomic, strong) NSDecimalNumber *xAxisFrom;	///< Plot areas: X axis starting point
+@property (nonatomic, strong) NSDecimalNumber *xAxisTo;		///< Plot areas: X axis ending point
+@property (nonatomic, copy) NSString *yAxisUnitName;		///< Plot areas: Y axis unit name
+@property (nonatomic, copy) NSString *yAxisDataType;		///< Plot areas: Y axis data type
+@property (nonatomic, strong) NSDecimalNumber *yAxisFrom;	///< Plot areas: Y axis starting point
+@property (nonatomic, strong) NSDecimalNumber *yAxisTo;		///< Plot areas: Y axis ending point
+
+@property (nonatomic, readonly, assign) BOOL topmost;		///< YES if this area lies directly on the PDF, i.e. not nested in another area
 @property (nonatomic, copy) NSArray *areas;					///< An area can have any number of subareas
 
 + (id)newAreaOnChart:(CHChart *)chart withDictionary:(NSDictionary *)dict;

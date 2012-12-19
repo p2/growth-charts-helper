@@ -54,8 +54,8 @@
 	
 	NSUInteger pageNum = [self.document indexForPage:page] + 1;
 	NSSize pageSize = [self rowSizeForPage:page];
-	//NSRect pageBounds = [page boundsForBox:[self displayBox]];			// kPDFDisplayBoxCropBox is our default display mode, not kPDFDisplayBoxMediaBox
 	NSRect pageFrame = NSMakeRect(0.f, 0.f, pageSize.width, pageSize.height);
+	NSSize origSize = [page boundsForBox:[self displayBox]].size;				// kPDFDisplayBoxCropBox is our default display mode, not kPDFDisplayBoxMediaBox
 	
 	// remove old areas
 	if ([_addedAreas count] > 0) {
@@ -73,7 +73,8 @@
 		for (CHChartArea *area in areas) {
 			if (pageNum == area.page) {
 				CHChartAreaView *areaView = [area view];
-				[areaView positionInFrame:pageFrame onView:docView pageSize:docView.bounds.size];
+				areaView.pageView = self;
+				[areaView positionInFrame:pageFrame onView:docView pageSize:origSize];
 				
 				[_addedAreas addObject:areaView];
 			}
@@ -118,58 +119,32 @@
 }
 
 
-/**
- *  We need this to override PDFView subviews intercepting our mouse events.
- */
-- (NSView *)hitTest:(NSPoint)aPoint
+
+#pragma mark - Area Handling
+- (void)didGetClicked:(CHChartAreaView *)areaView
 {
-	/*/
-	for (NSView *view in [self subviews]) {
-		DLog(@"->  %@", view);
-		for (NSView *view2 in [view subviews]) {
-			DLog(@"-->  %@", view2);
-			for (NSView *view3 in [view2 subviews]) {
-				DLog(@"--->  %@", view3);
-				for (NSView *view4 in [view3 subviews]) {
-					DLog(@"---->  %@", view4);
-					if ([view4 isKindOfClass:NSClassFromString(@"PDFDisplayView")]) {
-						CGPoint inPoint = [view4 convertPoint:aPoint fromView:self];
-						if (NSPointInRect(inPoint, view4.bounds)) {
-							return self;
-						}
-					}
-				}
-			}
+	// do not go ahead if an area's superview is active
+	CHChartAreaView *superArea = areaView;
+	while ((superArea = (CHChartAreaView *)[superArea superview])) {
+		if (![superArea isKindOfClass:[CHChartAreaView class]]) {
+			break;
 		}
-	}	//*/
-	return [super hitTest:aPoint];
-}
-
-
-
-#pragma mark - Mouse Clicks and Drags
-- (void)mouseDown:(NSEvent *)theEvent
-{
-    // mouseInCloseBox and trackingCloseBoxHit are instance variables
-    if (NSPointInRect([self convertPoint:[theEvent locationInWindow] fromView:nil], NSZeroRect)) {
-    }
-    else if ([theEvent clickCount] > 1) {
-        [[self window] miniaturize:self];
-        return;
-    }
-}
-
-- (void)mouseDragged:(NSEvent *)theEvent
-{
-	//NSPoint windowOrigin;
-	//NSWindow *window = [self window];
+		if (superArea.active) {
+			return;
+		}
+	}
 	
-	//[self convertPoint:[theEvent locationInWindow] fromView:nil]
+	// alright, make this the active area
+	self.activeArea = areaView;
 }
 
-- (void)mouseUp:(NSEvent *)theEvent
+- (void)setActiveArea:(CHChartAreaView *)activeArea
 {
-    
+	if (activeArea != _activeArea) {
+		_activeArea.active = NO;
+		_activeArea = activeArea;
+		_activeArea.active = YES;
+	}
 }
 
 
