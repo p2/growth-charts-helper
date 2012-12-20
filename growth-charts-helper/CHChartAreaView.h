@@ -77,7 +77,5 @@
 
 + (Class)registeredClassForType:(NSString *)aType;
 
-+ (NSCharacterSet *)outlinePathSplitSet;
-
 
 @end

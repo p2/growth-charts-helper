@@ -432,27 +432,6 @@
 
 
 
-#pragma mark - Class Static Methods
-/**
- *  Where to split the points in the "outline" property.
- *
- *  This usually is just the semi-colon, but we also add whitespace in case the spec is not 100% accurate.
- *  @return A character set at which to split the points in the "outline" property.
- */
-+ (NSCharacterSet *)outlinePathSplitSet
-{
-	static NSCharacterSet *outlinePathSplitSet = nil;
-	if (!outlinePathSplitSet) {
-		NSMutableCharacterSet *set = [[NSCharacterSet whitespaceAndNewlineCharacterSet] mutableCopy];
-		[set addCharactersInString:@";"];
-		outlinePathSplitSet = [set copy];
-	}
-	
-	return outlinePathSplitSet;
-}
-
-
-
 #pragma mark - Utilities
 - (NSString *)description
 {

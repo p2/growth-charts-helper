@@ -93,10 +93,10 @@
 	}
 	
 	self.name = [dict objectForKey:@"name"];
+	self.source = [dict objectForKey:@"source"];
 	self.sourceName = [dict objectForKey:@"sourceName"];
 	self.sourceAcronym = [dict objectForKey:@"sourceAcronym"];
 	self.shortDescription = [dict objectForKey:@"description"];
-	self.source = [dict objectForKey:@"source"];
 	self.gender = [[dict objectForKey:@"gender"] intValue];
 	if (_gender != CHGenderFemale && _gender != CHGenderMale) {
 		_gender = CHGenderUnknown;
@@ -105,27 +105,71 @@
 	
 	// find areas
 	NSArray *areas = [dict objectForKey:@"areas"];
-	if ([areas isKindOfClass:[NSArray class]] && [areas count] > 0) {
-		NSMutableSet *chartSet = [NSMutableSet setWithCapacity:[areas count]];
-		
-		// instantiate areas
-		for (NSDictionary *areaDict in areas) {
-			if ([areaDict isKindOfClass:[NSDictionary class]]) {
-				CHChartArea *area = [CHChartArea newAreaOnChart:self withDictionary:areaDict];
+	if ([areas isKindOfClass:[NSArray class]]) {
+		if ([areas count] > 0) {
+			NSMutableSet *chartSet = [NSMutableSet setWithCapacity:[areas count]];
+			
+			// instantiate areas
+			for (NSDictionary *areaDict in areas) {
+				CHChartArea *area = [CHChartArea newFromJSONObject:areaDict];
 				if (area) {
+					area.chart = self;
+					area.topmost = YES;
 					[chartSet addObject:area];
 				}
 			}
+			self.chartAreas = chartSet;
 		}
-		self.chartAreas = chartSet;
+	}
+	else if (areas) {
+		DLog(@"\"areas\" must be an array, but I got a %@, discarding", NSStringFromClass([areas class]));
 	}
 	
 	return YES;
 }
 
+/**
+ *  Will create a dictionary representing this chart.
+ */
 - (id)jsonObject
 {
-	return nil;
+	NSMutableDictionary *dict = [NSMutableDictionary new];
+	
+	// fill our properties
+	if ([_name length] > 0) {
+		[dict setObject:_name forKey:@"name"];
+	}
+	if ([_source length] > 0) {
+		[dict setObject:_source forKey:@"source"];
+	}
+	if ([_sourceName length] > 0) {
+		[dict setObject:_sourceName forKey:@"sourceName"];
+	}
+	if ([_sourceAcronym length] > 0) {
+		[dict setObject:_sourceAcronym forKey:@"sourceAcronym"];
+	}
+	if ([_shortDescription length] > 0) {
+		[dict setObject:_shortDescription forKey:@"description"];
+	}
+	[dict setObject:[NSNumber numberWithInt:_gender] forKey:@"gender"];
+	if (_ageRange) {
+		[dict setObject:[_ageRange stringValue] forKey:@"ageRange"];
+	}
+	
+	// add our areas
+	if ([_chartAreas count] > 0) {
+		NSMutableArray *areas = [NSMutableArray arrayWithCapacity:[_chartAreas count]];
+		for (CHChartArea *area in _chartAreas) {
+			id obj = [area jsonObject];
+			if (obj) {
+				[areas addObject:obj];
+			}
+		}
+		
+		[dict setObject:areas forKey:@"areas"];
+	}
+	
+	return dict;
 }
 
 

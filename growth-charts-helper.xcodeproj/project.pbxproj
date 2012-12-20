@@ -104,8 +104,6 @@
 		EEEB2D661680E014004DC719 = {
 			isa = PBXGroup;
 			children = (
-				EEEB2DE11681047B004DC719 /* Quartz.framework */,
-				EEEB2DD51680F1E0004DC719 /* QuartzCore.framework */,
 				EEEB2D7B1680E014004DC719 /* growth-charts-helper */,
 				EEEB2D741680E014004DC719 /* Frameworks */,
 				EEEB2D721680E014004DC719 /* Products */,
@@ -123,6 +121,8 @@
 		EEEB2D741680E014004DC719 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EEEB2DE11681047B004DC719 /* Quartz.framework */,
+				EEEB2DD51680F1E0004DC719 /* QuartzCore.framework */,
 				EEEB2D751680E014004DC719 /* Cocoa.framework */,
 				EEEB2D771680E014004DC719 /* Other Frameworks */,
 			);

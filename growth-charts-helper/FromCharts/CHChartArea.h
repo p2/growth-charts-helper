@@ -22,6 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import "CHChart.h"
+#import "CHJSONHandling.h"
 
 @class CHChartAreaView;
 
@@ -29,10 +30,11 @@
 /**
  *	Describes a rectangular area on a chart.
  */
-@interface CHChartArea : NSObject
+@interface CHChartArea : NSObject <CHJSONHandling>
 
 @property (nonatomic, weak) CHChart *chart;					///< The chart to which we belong
 @property (nonatomic, copy) NSString *type;					///< The type of the area
+@property (nonatomic, copy) NSArray *outlinePoints;			///< An array of CGPoints (in NSValues) that define the path for our outline
 @property (nonatomic, copy) NSDictionary *dictionary;		///< The dictionary representation defining the receiver, kept around to spawn the view objects
 
 @property (nonatomic, assign) NSUInteger page;				///< 1 by default. The page number of the PDF this area resides on
@@ -55,14 +57,14 @@
 @property (nonatomic, copy) NSString *yAxisDataType;		///< Plot areas: Y axis data type
 @property (nonatomic, strong) NSDecimalNumber *yAxisFrom;	///< Plot areas: Y axis starting point
 @property (nonatomic, strong) NSDecimalNumber *yAxisTo;		///< Plot areas: Y axis ending point
+@property (nonatomic, copy) NSString *statsSource;			///< Plot areas: The source for eventual statistics
 
-@property (nonatomic, readonly, assign) BOOL topmost;		///< YES if this area lies directly on the PDF, i.e. not nested in another area
+@property (nonatomic, assign) BOOL topmost;					///< YES if this area lies directly on the PDF, i.e. not nested in another area
 @property (nonatomic, copy) NSArray *areas;					///< An area can have any number of subareas
 
-+ (id)newAreaOnChart:(CHChart *)chart withDictionary:(NSDictionary *)dict;
-- (void)setFromDictionary:(NSDictionary *)dict;
-
 - (CHChartAreaView *)view;
+
++ (NSCharacterSet *)outlinePathSplitSet;
 
 
 @end

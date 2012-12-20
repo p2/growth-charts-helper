@@ -26,33 +26,35 @@
 
 @interface CHChartArea ()
 
-@property (nonatomic, readwrite, assign) BOOL topmost;
-
 @end
 
 
 @implementation CHChartArea
 
 
-+ (id)newAreaOnChart:(CHChart *)chart withDictionary:(NSDictionary *)dict
+#pragma mark - JSON Handling
++ (id)newFromJSONObject:(id)object
 {
-	CHChartArea *this = [self new];
-	this.chart = chart;
-	this.topmost = YES;
-	[this setFromDictionary:dict];
+	CHChartArea *area = [CHChartArea new];
+	if ([area setFromJSONObject:object]) {
+		return area;
+	}
 	
-	return this;
+	return nil;
 }
 
 
-
 /**
- *	Sets all properties it recognizes from the dict, leaves other properties at their current value.
- *
- *	Call super in subclasses unless you know what you are doing.
+ *  Fill from a dictionary passed in from decoding JSON.
  */
-- (void)setFromDictionary:(NSDictionary *)dict
+- (BOOL)setFromJSONObject:(id)object
 {
+	if (![object isKindOfClass:[NSDictionary class]]) {
+		DLog(@"I need a dictionary, but got a %@: %@", NSStringFromClass([object class]), object);
+		return NO;
+	}
+	
+	NSDictionary *dict = (NSDictionary *)object;
 	NSMutableDictionary *muteDict = [dict mutableCopy];
 	
 	// type
@@ -85,7 +87,24 @@
 		self.frame = CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 	}
 	else if (rectString) {
-		DLog(@"\"rect\" must be a NSString, but I got a %@, discarding", NSStringFromClass([rectString class]));
+		DLog(@"\"rect\" must be a string, but I got a %@, discarding", NSStringFromClass([rectString class]));
+	}
+	
+	// outline
+	NSString *outlineString = [dict objectForKey:@"outline"];
+	if ([outlineString isKindOfClass:[NSString class]]) {
+		NSArray *points = [outlineString componentsSeparatedByCharactersInSet:[[self class] outlinePathSplitSet]];
+		if ([points count] > 0) {
+			NSMutableArray *outPoints = [NSMutableArray arrayWithCapacity:[points count]];
+			for (NSString *pointStr in points) {
+				NSPoint point = NSPointFromString(pointStr);
+				[outPoints addObject:[NSValue valueWithPoint:point]];
+			}
+			self.outlinePoints = outPoints;
+		}
+	}
+	else if (outlineString) {
+		DLog(@"\"outline\" must be a string, but I got a %@, discarding", NSStringFromClass([outlineString class]));
 	}
 	
 	// fonts
@@ -114,16 +133,25 @@
 		// x
 		NSDictionary *xAxisDict = [axesDict objectForKey:@"x"];
 		self.xAxisUnitName = [xAxisDict objectForKey:@"unit"];
-		self.xAxisDataType = [xAxisDict objectForKey:@"datatype"];
-		self.xAxisFrom = [NSDecimalNumber decimalNumberWithString:[xAxisDict objectForKey:@"from"]];
-		self.xAxisTo = [NSDecimalNumber decimalNumberWithString:[xAxisDict objectForKey:@"to"]];
+		self.xAxisDataType = [xAxisDict objectForKey:@"dataType"];
+		self.xAxisFrom = [NSDecimalNumber decimalNumberWithString:[[xAxisDict objectForKey:@"from"] description]];
+		self.xAxisTo = [NSDecimalNumber decimalNumberWithString:[[xAxisDict objectForKey:@"to"] description]];
 		
 		// y
 		NSDictionary *yAxisDict = [axesDict objectForKey:@"y"];
 		self.yAxisUnitName = [yAxisDict objectForKey:@"unit"];
-		self.yAxisDataType = [yAxisDict objectForKey:@"datatype"];
-		self.yAxisFrom = [NSDecimalNumber decimalNumberWithString:[yAxisDict objectForKey:@"from"]];
-		self.yAxisTo = [NSDecimalNumber decimalNumberWithString:[yAxisDict objectForKey:@"to"]];
+		self.yAxisDataType = [yAxisDict objectForKey:@"dataType"];
+		self.yAxisFrom = [NSDecimalNumber decimalNumberWithString:[[yAxisDict objectForKey:@"from"] description]];
+		self.yAxisTo = [NSDecimalNumber decimalNumberWithString:[[yAxisDict objectForKey:@"to"] description]];
+		
+		// stats source
+		NSString *statsSource = [dict objectForKey:@"statsSource"];
+		if ([statsSource isKindOfClass:[NSString class]]) {
+			self.statsSource = statsSource;
+		}
+		else if (statsSource) {
+			DLog(@"\"statsSource\" should be a string, but got a %@, discarding", NSStringFromClass([statsSource class]));
+		}
 	}
 	else if ([@"plot" isEqualToString:_type]) {
 		DLog(@"This plot area does not have axes!  %@", dict);
@@ -131,28 +159,127 @@
 	
 	// ** sub-areas
 	NSArray *areas = [dict objectForKey:@"areas"];
-	if ([areas isKindOfClass:[NSArray class]] && [areas count] > 0) {
-		NSMutableArray *myAreas = [NSMutableArray arrayWithCapacity:[areas count]];
-		
-		// loop sub-areas
-		for (NSDictionary *areaDict in areas) {
-			if ([areaDict isKindOfClass:[NSDictionary class]]) {
-				CHChartArea *area = [CHChartArea newAreaOnChart:_chart withDictionary:areaDict];
+	if ([areas isKindOfClass:[NSArray class]]) {
+		if ([areas count] > 0) {
+			NSMutableArray *myAreas = [NSMutableArray arrayWithCapacity:[areas count]];
+			
+			// loop sub-areas
+			for (NSDictionary *areaDict in areas) {
+				CHChartArea *area = [CHChartArea newFromJSONObject:areaDict];
 				if (area) {
+					area.chart = _chart;
 					area.topmost = NO;
 					area.page = self.page;
 					[myAreas addObject:area];
 				}
 			}
+			
+			self.areas = myAreas;
 		}
-		
-		self.areas = myAreas;
+	}
+	else if (areas) {
+		DLog(@"\"areas\" must be an array, but I got a %@, discarding", NSStringFromClass([areas class]));
 	}
 	[muteDict removeObjectForKey:@"areas"];
 	
 	// remember all the other properties
 	self.dictionary = muteDict;
+	return YES;
 }
+
+- (id)jsonObject
+{
+	if ([_type length] < 1) {
+		DLog(@"This area does not have a type, not returning a JSON object");
+		return nil;
+	}
+	
+	// basic properties
+	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:_type forKey:@"type"];
+	if (_topmost && _page > 0) {
+		[dict setObject:[NSNumber numberWithUnsignedInteger:_page] forKey:@"page"];
+	}
+	[dict setObject:NSStringFromCGRect(_frame) forKey:@"rect"];
+	
+	// the outline
+	if ([_outlinePoints count] > 2) {
+		NSMutableArray *points = [NSMutableArray arrayWithCapacity:[_outlinePoints count]];
+		for (NSValue *point in _outlinePoints) {
+			[points addObject:NSStringFromCGPoint([point pointValue])];
+		}
+		NSString *pointString = [points componentsJoinedByString:@";"];
+		if ([pointString length] > 0) {
+			[dict setObject:pointString forKey:@"outline"];
+		}
+	}
+	else if ([_outlinePoints count] > 0) {
+		DLog(@"We need at least 3 outline points, %d are worthless", (int)[_outlinePoints count]);
+	}
+	
+	// plot areas
+	if ([@"plot" isEqualToString:_type]) {
+		NSDictionary *x = @{
+			@"dataType": _xAxisDataType ? _xAxisDataType : @"",
+			@"unit": _xAxisUnitName ? _xAxisUnitName : @"",
+			@"from": _xAxisFrom ? _xAxisFrom : @0,
+			@"to": _xAxisTo ? _xAxisTo : @0
+		};
+		NSDictionary *y = @{
+			@"dataType": _yAxisDataType ? _yAxisDataType : @"",
+			@"unit": _yAxisUnitName ? _yAxisUnitName : @"",
+			@"from": _yAxisFrom ? _yAxisFrom : @0,
+			@"to": _yAxisTo ? _yAxisTo : @0
+		};
+		
+		[dict setObject:@{@"x": x, @"y": y} forKey:@"axes"];
+		if ([_statsSource length] > 0) {
+			[dict setObject:_statsSource forKey:@"statsSource"];
+		}
+	}
+	
+	// areas with another type
+	else {
+		if ([_fontName length] > 0) {
+			[dict setObject:_fontName forKey:@"fontName"];
+		}
+		if (_fontSize) {
+			[dict setObject:_fontSize forKey:@"fontSize"];
+		}
+		if ([_dataType length] > 0) {
+			[dict setObject:_dataType forKey:@"dataType"];
+		}
+	}
+	
+	// subareas
+	if ([_areas count] > 0) {
+		NSMutableArray *subareas = [NSMutableArray arrayWithCapacity:[_areas count]];
+		for (CHChartArea *area in _areas) {
+			id json = [area jsonObject];
+			if (json) {
+				[subareas addObject:json];
+			}
+		}
+		[dict setObject:subareas forKey:@"areas"];
+	}
+	
+	return dict;
+}
+
+
+
+#pragma mark - KVC
+- (void)setChart:(CHChart *)chart
+{
+	if (chart != _chart) {
+		_chart = chart;
+		
+		// update sub-areas
+		for (CHChartArea *subarea in _areas) {
+			subarea.chart = _chart;
+		}
+	}
+}
+
 
 
 
@@ -184,6 +311,27 @@
 	
 	return view;
 }
+						   
+						   
+						   
+#pragma mark - Class Static Methods
+		/**
+		 *  Where to split the points in the "outline" property.
+		 *
+		 *  This usually is just the semi-colon, but we also add whitespace in case the spec is not 100% accurate.
+		 *  @return A character set at which to split the points in the "outline" property.
+		 */
+						   + (NSCharacterSet *)outlinePathSplitSet
+		{
+			static NSCharacterSet *outlinePathSplitSet = nil;
+			if (!outlinePathSplitSet) {
+				NSMutableCharacterSet *set = [[NSCharacterSet whitespaceAndNewlineCharacterSet] mutableCopy];
+				[set addCharactersInString:@";"];
+				outlinePathSplitSet = [set copy];
+			}
+			
+			return outlinePathSplitSet;
+		}
 
 
 
