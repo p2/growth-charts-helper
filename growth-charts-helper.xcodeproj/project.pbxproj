@@ -31,6 +31,7 @@
 		EEEB2DE016810423004DC719 /* CHChartPDFView.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DDF16810422004DC719 /* CHChartPDFView.m */; };
 		EEEB2DE21681047B004DC719 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEEB2DE11681047B004DC719 /* Quartz.framework */; };
 		EEEB2DE51681075A004DC719 /* CHDropView.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEB2DE41681075A004DC719 /* CHDropView.m */; };
+		EEEFDEB11682737B005C4D17 /* CHResizableChartAreaView.m in Sources */ = {isa = PBXBuildFile; fileRef = EEEFDEB01682737B005C4D17 /* CHResizableChartAreaView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +83,8 @@
 		EEEB2DE11681047B004DC719 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		EEEB2DE31681075A004DC719 /* CHDropView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHDropView.h; sourceTree = "<group>"; };
 		EEEB2DE41681075A004DC719 /* CHDropView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHDropView.m; sourceTree = "<group>"; };
+		EEEFDEAF1682737B005C4D17 /* CHResizableChartAreaView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHResizableChartAreaView.h; sourceTree = "<group>"; };
+		EEEFDEB01682737B005C4D17 /* CHResizableChartAreaView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHResizableChartAreaView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +151,8 @@
 				EEEB2DDF16810422004DC719 /* CHChartPDFView.m */,
 				EEEB2DD21680EE70004DC719 /* CHChartAreaView.h */,
 				EEEB2DD31680EE70004DC719 /* CHChartAreaView.m */,
+				EEEFDEAF1682737B005C4D17 /* CHResizableChartAreaView.h */,
+				EEEFDEB01682737B005C4D17 /* CHResizableChartAreaView.m */,
 				EEEB2DB91680EA29004DC719 /* FromCharts */,
 				EEEB2DDD168100EA004DC719 /* Helpers */,
 				EEEB2D8D1680E014004DC719 /* MainMenu.xib */,
@@ -291,6 +296,7 @@
 				EEAECBFE16815E2F00E8ABE1 /* CHRectToStringTransformer.m in Sources */,
 				EEAECC1716816B7800E8ABE1 /* CHFloatToStringTransformer.m in Sources */,
 				EEAECC1A16816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m in Sources */,
+				EEEFDEB11682737B005C4D17 /* CHResizableChartAreaView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

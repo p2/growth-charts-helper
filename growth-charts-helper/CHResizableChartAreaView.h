@@ -1,8 +1,8 @@
 /*
- CHChartPDFView.h
+ CHResizableChartAreaView.h
  growth-charts-helper
  
- Created by Pascal Pfiffner on 12/18/12.
+ Created by Pascal Pfiffner on 12/19/12.
  Copyright (c) 2012 CHIP. All rights reserved.
  
  This library is free software; you can redistribute it and/or
@@ -20,22 +20,12 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#import <Quartz/Quartz.h>
-
-@class CHChart;
-@class CHChartAreaView;
+#import "CHChartAreaView.h"
 
 
 /**
- *	Top level object to display a PDF chart.
+ *	Makes chart areas resizeable via mouse.
  */
-@interface CHChartPDFView : PDFView
-
-@property (nonatomic, strong) CHChart *chart;
-@property (nonatomic, strong) CHChartAreaView *activeArea;
-
-- (void)layoutSubviews;
-- (void)didBecomeFirstResponder:(CHChartAreaView *)areaView;
-
+@interface CHResizableChartAreaView : CHChartAreaView
 
 @end

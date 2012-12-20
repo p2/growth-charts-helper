@@ -121,7 +121,7 @@
 
 
 #pragma mark - Area Handling
-- (void)didGetClicked:(CHChartAreaView *)areaView
+- (void)didBecomeFirstResponder:(CHChartAreaView *)areaView
 {
 	// do not go ahead if an area's superview is active
 	CHChartAreaView *superArea = areaView;
@@ -141,15 +141,24 @@
 - (void)setActiveArea:(CHChartAreaView *)activeArea
 {
 	if (activeArea != _activeArea) {
-		_activeArea.active = NO;
 		_activeArea = activeArea;
-		_activeArea.active = YES;
+		[_activeArea makeFirstResponder];
 	}
 }
 
 
 
-#pragma mark - Mouse Wheel
+#pragma mark - Mouse Handling
+- (PDFAreaOfInterest)areaOfInterestForMouse:(NSEvent *)theEvent
+{
+	return kPDFControlArea;
+}
+
+- (void)setCursorForAreaOfInterest:(PDFAreaOfInterest)area
+{
+//	[[NSCursor openHandCursor] set];
+}
+
 - (void)scrollWheel:(NSEvent *)event
 {
 	if (event.deltaY < 0.f) {

@@ -55,6 +55,7 @@
 
 - (void)setFromDictionary:(NSDictionary *)dict;
 
+- (void)setup;
 - (void)reset;
 - (void)resetHighlight;
 
@@ -67,6 +68,9 @@
 - (void)updateWithDataSource:(id<CHChartDataSource>)dataSource;
 - (NSSet *)allDataTypes;
 - (NSSet *)plotDataTypes;
+
+- (BOOL)makeFirstResponder;
+- (void)didBecomeFirstResponder;
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(NSEvent *)event;
 - (NSSet *)areasAtPoint:(CGPoint)point;

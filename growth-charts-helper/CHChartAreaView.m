@@ -23,9 +23,13 @@
 #import "CHChartAreaView.h"
 #import "CHChartArea.h"
 #import "CHChartPDFView.h"
+#import "CHResizableChartAreaView.h"		// our subclass
 
 
-@interface CHChartAreaView ()
+@interface CHChartAreaView () {
+	BOOL clickStartedInside;
+	BOOL clickDidMove;
+}
 
 @end
 
@@ -42,17 +46,22 @@
 - (id)initWithFrame:(CGRect)frame
 {
 	if ((self = [super initWithFrame:frame])) {
-//		self.opaque = NO;
-//		self.backgroundColor = [UIColor clearColor];
-//		self.autoresizingMask = UIViewAutoresizingNone;
-//		self.clipsToBounds = NO;
-		
-//		self.clearsContextBeforeDrawing = NO;
-//		self.contentMode = UIViewContentModeRedraw;
-//		((CATiledLayer *)self.layer).levelsOfDetail = 4;
-//		((CATiledLayer *)self.layer).levelsOfDetailBias = 3;			// we use (levelsOfDetail - 1) because we only need more detail when zoomed in, no less details when zoomed out
+		[self setup];
 	}
 	return self;
+}
+
+- (void)setup
+{
+	//	self.opaque = NO;
+	//	self.backgroundColor = [UIColor clearColor];
+	//	self.autoresizingMask = UIViewAutoresizingNone;
+	//	self.clipsToBounds = NO;
+	
+	//	self.clearsContextBeforeDrawing = NO;
+	//	self.contentMode = UIViewContentModeRedraw;
+	//	((CATiledLayer *)self.layer).levelsOfDetail = 4;
+	//	((CATiledLayer *)self.layer).levelsOfDetailBias = 3;			// we use (levelsOfDetail - 1) because we only need more detail when zoomed in, no less details when zoomed out
 }
 
 
@@ -271,29 +280,48 @@
 
 
 
-#pragma mark - Drawing
-- (void)setActive:(BOOL)flag
+#pragma mark - First Responder
+- (BOOL)acceptsFirstResponder
 {
-	if (flag != _active) {
-		_active = flag;
-		[self setNeedsDisplay:YES];
-	}
+    return (clickStartedInside && !clickDidMove);
 }
 
-
-- (void)drawRect:(NSRect)dirtyRect
+/**
+ *  Disregards mouse movements to make the object first responder anyway.
+ */
+- (BOOL)makeFirstResponder
 {
-	[NSGraphicsContext saveGraphicsState];
-	
-	if (_active) {
-		[[NSColor colorWithDeviceRed:0.f green:1.f blue:0.f alpha:0.25f] setFill];
+	clickStartedInside = YES;
+	clickDidMove = NO;
+	return [[self window] makeFirstResponder:self];
+}
+
+- (BOOL)becomeFirstResponder
+{
+	BOOL done = NO;
+	if ([self acceptsFirstResponder]) {
+		done = [super becomeFirstResponder];
+		_active = done;
+		[self setNeedsDisplay:YES];
+		
+		if (done) {
+			[self didBecomeFirstResponder];
+		}
 	}
-	else {
-		[[NSColor colorWithDeviceRed:0.f green:0.f blue:1.f alpha:0.25f] setFill];
-	}
-	
-	[NSBezierPath fillRect:self.bounds];
-	[NSGraphicsContext restoreGraphicsState];
+	return done;
+}
+
+- (void)didBecomeFirstResponder
+{
+	[_pageView didBecomeFirstResponder:self];
+}
+
+- (BOOL)resignFirstResponder
+{
+	BOOL done = [super resignFirstResponder];
+	_active = done ? NO : _active;
+	[self setNeedsDisplay:YES];
+	return done;
 }
 
 
@@ -348,22 +376,50 @@
 	return NSPointInRect(location, [self bounds]);
 }
 
-
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	//DLog(@"%@ -- %@", self, theEvent);
+	clickStartedInside = YES;
+}
+
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+	if (clickStartedInside) {
+		clickDidMove = YES;
+	}
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-	if (_active) {
-		
+	if (clickStartedInside) {
+		clickDidMove = YES;
 	}
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	[_pageView didGetClicked:self];
+	if ([self acceptsFirstResponder]) {
+		[[self window] makeFirstResponder:self];
+	}
+	clickStartedInside = NO;
+	clickDidMove = NO;
+}
+
+
+
+#pragma mark - Drawing
+- (void)drawRect:(NSRect)dirtyRect
+{
+	[NSGraphicsContext saveGraphicsState];
+	
+	if (_active) {
+		[[NSColor colorWithDeviceRed:0.f green:1.f blue:0.f alpha:0.25f] setFill];
+	}
+	else {
+		[[NSColor colorWithDeviceRed:0.f green:0.f blue:1.f alpha:0.25f] setFill];
+	}
+	
+	[NSBezierPath fillRect:self.bounds];
+	[NSGraphicsContext restoreGraphicsState];
 }
 
 
@@ -371,7 +427,7 @@
 #pragma mark - Class Registration
 + (Class)registeredClassForType:(NSString *)aType
 {
-	return self;
+	return [CHResizableChartAreaView class];
 }
 
 
