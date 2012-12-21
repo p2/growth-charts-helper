@@ -33,8 +33,6 @@
 @property (nonatomic, strong) NSButton *zoomIn;
 @property (nonatomic, strong) NSButton *zoomOut;
 
-@property (nonatomic, strong) NSMutableSet *addedAreas;
-
 @end
 
 
@@ -57,26 +55,14 @@
 	NSRect pageFrame = NSMakeRect(0.f, 0.f, pageSize.width, pageSize.height);
 	NSSize origSize = [page boundsForBox:[self displayBox]].size;				// kPDFDisplayBoxCropBox is our default display mode, not kPDFDisplayBoxMediaBox
 	
-	// remove old areas
-	if ([_addedAreas count] > 0) {
-		// TODO: Do NOT remove areas on other pages
-		[_addedAreas makeObjectsPerformSelector:@selector(removeFromSuperviewWithoutNeedingDisplay)];
-		[_addedAreas removeAllObjects];
-	}
-	if (!_addedAreas) {
-		self.addedAreas = [NSMutableSet set];
-	}
-	
-	// add our areas
+	// add/reposition our areas
 	NSSet *areas = _chart.chartAreas;
 	if ([areas count] > 0) {
 		for (CHChartArea *area in areas) {
 			if (pageNum == area.page) {
-				CHChartAreaView *areaView = [area view];
+				CHChartAreaView *areaView = [area viewForParent:self];
 				areaView.pageView = self;
 				[areaView positionInFrame:pageFrame onView:docView pageSize:origSize];
-				
-				[_addedAreas addObject:areaView];
 			}
 			else {
 				DLog(@"Skipping area %@, not on page %lu", area, pageNum);

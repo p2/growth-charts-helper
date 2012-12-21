@@ -26,6 +26,8 @@
 
 @interface CHChartArea ()
 
+@property (nonatomic, strong) NSMapTable *knownViews;
+
 @end
 
 
@@ -285,12 +287,19 @@
 
 #pragma mark - Returning the View
 /**
- *  Returns a new CHChartAreaView instance created from the properties of the receiver (including sub-areas)
+ *  Returns a CHChartAreaView instance, newly created if not previously done for the parentView, from the properties of the receiver (including sub-areas).
  */
-- (CHChartAreaView *)view
+- (CHChartAreaView *)viewForParent:(id)parentView
 {
+	// do we already have one?
+	CHChartAreaView *view = [_knownViews objectForKey:parentView];
+	if (view) {
+		return view;
+	}
+	
+	// nope, don't have one!
 	Class viewClass = [CHChartAreaView registeredClassForType:_type];
-	CHChartAreaView *view = [viewClass new];
+	view = [viewClass new];
 	if (!view) {
 		DLog(@"Failed to create a view for area %@", self);
 		return nil;
@@ -303,11 +312,17 @@
 	if ([_areas count] > 0) {
 		NSMutableArray *subviews = [NSMutableArray arrayWithCapacity:[_areas count]];
 		for (CHChartArea *subarea in _areas) {
-			CHChartAreaView *subview = [subarea view];
+			CHChartAreaView *subview = [subarea viewForParent:self];
 			[subviews addObject:subview];
 		}
 		view.areas = subviews;
 	}
+	
+	// store and return
+	if (!_knownViews) {
+		self.knownViews = [NSMapTable mapTableWithKeyOptions:NSMapTableWeakMemory valueOptions:NSMapTableWeakMemory];
+	}
+	[_knownViews setObject:view forKey:parentView];
 	
 	return view;
 }
@@ -315,23 +330,23 @@
 						   
 						   
 #pragma mark - Class Static Methods
-		/**
-		 *  Where to split the points in the "outline" property.
-		 *
-		 *  This usually is just the semi-colon, but we also add whitespace in case the spec is not 100% accurate.
-		 *  @return A character set at which to split the points in the "outline" property.
-		 */
-						   + (NSCharacterSet *)outlinePathSplitSet
-		{
-			static NSCharacterSet *outlinePathSplitSet = nil;
-			if (!outlinePathSplitSet) {
-				NSMutableCharacterSet *set = [[NSCharacterSet whitespaceAndNewlineCharacterSet] mutableCopy];
-				[set addCharactersInString:@";"];
-				outlinePathSplitSet = [set copy];
-			}
-			
-			return outlinePathSplitSet;
-		}
+/**
+ *  Where to split the points in the "outline" property.
+ *
+ *  This usually is just the semi-colon, but we also add whitespace in case the spec is not 100% accurate.
+ *  @return A character set at which to split the points in the "outline" property.
+ */
++ (NSCharacterSet *)outlinePathSplitSet
+{
+	static NSCharacterSet *outlinePathSplitSet = nil;
+	if (!outlinePathSplitSet) {
+		NSMutableCharacterSet *set = [[NSCharacterSet whitespaceAndNewlineCharacterSet] mutableCopy];
+		[set addCharactersInString:@";"];
+		outlinePathSplitSet = [set copy];
+	}
+	
+	return outlinePathSplitSet;
+}
 
 
 

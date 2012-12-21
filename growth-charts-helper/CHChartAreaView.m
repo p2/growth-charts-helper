@@ -27,6 +27,8 @@
 
 
 @interface CHChartAreaView () {
+	CGRect inParentRect;
+	
 	BOOL clickStartedInside;
 	BOOL clickDidMove;
 }
@@ -71,8 +73,7 @@
 		_area = area;
 		
 		// set some properties
-		self.origin = area.frame.origin;
-		self.size = area.frame.size;
+		self.relFrame = area.frame;
 	}
 }
 
@@ -196,12 +197,12 @@
 {
 	if (!CGRectIsEmpty(targetRect)) {
 		CGRect appliedRect = targetRect;
+		inParentRect = targetRect;
 		
-		appliedRect.origin.x += _origin.x * appliedRect.size.width;
-		//appliedRect.origin.y += _origin.y * appliedRect.size.height;
-		appliedRect.origin.y += (1.f - _origin.y) * appliedRect.size.height - (_size.height * appliedRect.size.height);
-		appliedRect.size.width *= _size.width;
-		appliedRect.size.height *= _size.height;
+		appliedRect.origin.x += _relFrame.origin.x * appliedRect.size.width;
+		appliedRect.origin.y += _relFrame.origin.y * appliedRect.size.height;
+		appliedRect.size.width *= _relFrame.size.width;
+		appliedRect.size.height *= _relFrame.size.height;
 		
 		self.frame = appliedRect;						// will cause setNeedsDisplay to be set if the size changed
 		self.pageSize = pageSize;
@@ -213,6 +214,25 @@
 	for (CHChartAreaView *area in _areas) {
 		area.pageView = _pageView;
 		[area positionInFrame:self.bounds onView:self pageSize:pageSize];
+	}
+}
+
+
+/**
+ *  We override setFrame to update the relative frame when moving the box.
+ */
+- (void)setFrame:(NSRect)frameRect
+{
+	if (!NSEqualRects(self.frame, frameRect)) {
+		[super setFrame:frameRect];
+		
+		// update relative frame
+		_relFrame.origin.x = frameRect.origin.x / inParentRect.size.width;
+		_relFrame.origin.y = frameRect.origin.y / inParentRect.size.height;
+		_relFrame.size.width = frameRect.size.width / inParentRect.size.width;
+		_relFrame.size.height = frameRect.size.height / inParentRect.size.height;
+		
+		self.area.frame = _relFrame;
 	}
 }
 
@@ -376,6 +396,9 @@
 	return NSPointInRect(location, [self bounds]);
 }
 
+
+
+#pragma mark - Mouse Handling
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	clickStartedInside = YES;
@@ -435,7 +458,7 @@
 #pragma mark - Utilities
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%@ <%p> {%@,%@}, %d sub-areas", NSStringFromClass([self class]), self, NSStringFromCGPoint(_origin), NSStringFromCGSize(_size), (int)[_areas count]];
+	return [NSString stringWithFormat:@"%@ <%p> %@, %d sub-areas", NSStringFromClass([self class]), self, NSStringFromCGRect(_relFrame), (int)[_areas count]];
 }
 
 

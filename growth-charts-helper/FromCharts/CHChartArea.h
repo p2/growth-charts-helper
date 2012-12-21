@@ -62,7 +62,7 @@
 @property (nonatomic, assign) BOOL topmost;					///< YES if this area lies directly on the PDF, i.e. not nested in another area
 @property (nonatomic, copy) NSArray *areas;					///< An area can have any number of subareas
 
-- (CHChartAreaView *)view;
+- (CHChartAreaView *)viewForParent:(id)parentView;
 
 + (NSCharacterSet *)outlinePathSplitSet;
 

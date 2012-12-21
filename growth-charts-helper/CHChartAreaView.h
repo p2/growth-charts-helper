@@ -43,8 +43,7 @@
 
 @property (nonatomic, weak) CHChartArea *area;				///< The area model that describes the receiver
 
-@property (nonatomic, assign) CGPoint origin;				///< Origin between 0 and 1 relative to its parent's grid
-@property (nonatomic, assign) CGSize size;					///< Size between 0 and 1 relative to its parent's grid
+@property (nonatomic, assign) CGRect relFrame;				///< The frame relative to its parent's grid (from 0 to 1)
 @property (nonatomic, assign) CGPathRef outline;			///< The outline of the area. We do *not* clip to this area, but you can use it to do so.
 @property (nonatomic, assign) CGSize pageSize;				///< The size of the page we're currently displayed on, in screen pixels
 
