@@ -33,15 +33,18 @@
  */
 @interface CHWindowController : NSWindowController <NSSplitViewDelegate>
 
-@property (nonatomic, readonly, strong) CHChart *chart;
+@property (nonatomic, readonly, weak) CHChart *chart;
 @property (nonatomic, readonly, weak) CHChartArea *activeArea;
 @property (nonatomic, readonly, strong) CHChartPDFView *pdf;
 
 @property (nonatomic, weak) IBOutlet NSView *leftPane;
 @property (nonatomic, weak) IBOutlet NSView *rightPane;
 @property (nonatomic, strong) IBOutlet CHDropView *dropWell;
+
+@property (nonatomic, weak) IBOutlet NSTabView *mainTabView;
 @property (nonatomic, weak) IBOutlet NSTextField *pdfFoundLabel;
 @property (nonatomic, weak) IBOutlet NSButton *pdfFoundButton;
+
 @property (nonatomic, weak) IBOutlet NSTabView *optionsBox;
 @property (nonatomic, weak) IBOutlet NSBox *hierarchyBox;
 

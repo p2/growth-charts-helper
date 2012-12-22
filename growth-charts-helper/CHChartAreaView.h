@@ -43,7 +43,6 @@
 
 @property (nonatomic, weak) CHChartArea *area;				///< The area model that describes the receiver
 
-@property (nonatomic, assign) CGRect relFrame;				///< The frame relative to its parent's grid (from 0 to 1)
 @property (nonatomic, assign) CGPathRef outline;			///< The outline of the area. We do *not* clip to this area, but you can use it to do so.
 @property (nonatomic, assign) CGSize pageSize;				///< The size of the page we're currently displayed on, in screen pixels
 
@@ -58,6 +57,7 @@
 - (void)resetHighlight;
 
 - (void)positionInFrame:(CGRect)targetRect onView:(NSView *)aView pageSize:(CGSize)pageSize;
+- (void)reposition;
 - (CHChartAreaView *)didAddArea:(CHChartArea *)area;
 - (void)didRemoveArea:(CHChartArea *)area;
 

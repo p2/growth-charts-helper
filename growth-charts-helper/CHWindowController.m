@@ -32,6 +32,7 @@
 	NSUInteger currentAreaIndex;
 }
 
+@property (nonatomic, readwrite, weak) CHChart *chart;
 @property (nonatomic, readwrite, weak) CHChartArea *activeArea;
 @property (nonatomic, readwrite, strong) CHChartPDFView *pdf;
 
@@ -45,6 +46,14 @@
 
 
 @implementation CHWindowController
+
+
+- (void)dealloc
+{
+	self.activeArea = nil;
+	self.pdf = nil;
+}
+
 
 
 #pragma mark - View Handling
@@ -86,6 +95,26 @@
 
 
 #pragma mark - PDF Handling
+- (void)setPdf:(CHChartPDFView *)pdf
+{
+	if (pdf != _pdf) {
+		if (_pdf) {
+			[_pdf removeObserver:self forKeyPath:@"activeArea"];
+			[_pdf removeFromSuperview];
+		}
+		
+		[self willChangeValueForKey:@"pdf"];
+		_pdf = pdf;
+		[self didChangeValueForKey:@"pdf"];
+		
+		// we need to observe the active area
+		if (_pdf) {
+			[_pdf addObserver:self forKeyPath:@"activeArea" options:0 context:NULL];
+		}
+	}
+}
+
+
 - (void)loadPDFAt:(NSURL *)url
 {
 	DLog(@"--> %@", url);
@@ -117,9 +146,6 @@
 	[_leftPane addSubview:_pdf];
 	[_pdf layoutSubviews];
 	
-	// we need to observe the active area
-	[_pdf addObserver:self forKeyPath:@"activeArea" options:0 context:NULL];
-	
 	// update button
 	_pdfFoundButton.title = @"Unload PDF";
 	[_pdfFoundButton setEnabled:YES];
@@ -147,11 +173,7 @@
 - (void)unloadPDF:(id)sender
 {
 	// remove PDF
-	if (_pdf) {
-		[_pdf removeObserver:self forKeyPath:@"activeArea"];
-		[_pdf removeFromSuperview];
-		self.pdf = nil;
-	}
+	self.pdf = nil;
 	
 	// update button and add drop well
 	[self updateFoundPDFStatus];
@@ -182,14 +204,15 @@
 
 
 #pragma mark - Chart Handling
+- (void)setDocument:(NSDocument *)document
+{
+	[super setDocument:document];
+	self.chart = [self pdfDocument].chart;
+}
+
 - (CHDocument *)pdfDocument
 {
 	return (CHDocument *)self.document;
-}
-
-- (CHChart *)chart
-{
-	return [self pdfDocument].chart;
 }
 
 
@@ -204,6 +227,21 @@
 		[self willChangeValueForKey:@"activeArea"];
 		_activeArea = activeArea;
 		[self didChangeValueForKey:@"activeArea"];
+		
+		// make some changes the the UI
+		if (_activeArea) {
+			[_mainTabView selectLastTabViewItem:nil];
+			
+			if ([@"plot" isEqualToString:activeArea.type]) {
+				[_optionsBox selectFirstTabViewItem:nil];
+			}
+			else {
+				[_optionsBox selectLastTabViewItem:nil];
+			}
+		}
+		else {
+			[_mainTabView selectFirstTabViewItem:nil];
+		}
 	}
 }
 
@@ -211,17 +249,26 @@
 {
 	if ([_currentAreaStack count] > sender.tag) {
 		currentAreaIndex = sender.tag;
-		_pdf.activeArea = ((CHChartAreaView *)[_currentAreaStack objectAtIndex:currentAreaIndex]);
+		CHChartAreaView *nowActive = (CHChartAreaView *)[_currentAreaStack objectAtIndex:currentAreaIndex];
+		if (nowActive) {
+			_pdf.activeArea = nowActive;
+			[nowActive makeFirstResponder];
+		}
 	}
 }
 
 - (IBAction)addArea:(id)sender
 {
 	CHChartArea *newArea = [[self chart] newAreaInParentArea:_activeArea];
-	[_pdf didAddArea:newArea];		// we need to message this to the PDF View, sub-areas will auto-message their parent views (if there are any)
+	[self doAddArea:newArea];
+}
+
+- (void)doAddArea:(CHChartArea *)area
+{
+	[_pdf didAddArea:area];		// we need to message this to the PDF View, sub-areas will auto-message their parent views (if there are any)
 	
 	// make undoable
-	[self.undoManager registerUndoWithTarget:[self chart] selector:@selector(removeArea:) object:newArea];
+	[self.undoManager registerUndoWithTarget:self selector:@selector(doRemoveArea:) object:area];
 }
 
 - (IBAction)removeArea:(id)sender
@@ -230,13 +277,17 @@
 		return;
 	}
 	
+	[self doRemoveArea:_activeArea];
+}
+
+- (void)doRemoveArea:(CHChartArea *)area
+{
 	// make undoable
-	[self.undoManager registerUndoWithTarget:[self chart] selector:@selector(addArea:) object:_activeArea];
+	[self.undoManager registerUndoWithTarget:self selector:@selector(doAddArea:) object:area];
 	
 	// remove
-	CHChartArea *currArea = _activeArea;
-	[[self chart] removeArea:currArea];
-	[_pdf didRemoveArea:currArea];
+	[[self chart] removeArea:area];
+	[_pdf didRemoveArea:area];
 }
 
 

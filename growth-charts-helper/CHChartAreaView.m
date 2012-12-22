@@ -52,26 +52,6 @@
 
 - (void)setup
 {
-	//	self.opaque = NO;
-	//	self.backgroundColor = [UIColor clearColor];
-	//	self.autoresizingMask = UIViewAutoresizingNone;
-	//	self.clipsToBounds = NO;
-	
-	//	self.clearsContextBeforeDrawing = NO;
-	//	self.contentMode = UIViewContentModeRedraw;
-	//	((CATiledLayer *)self.layer).levelsOfDetail = 4;
-	//	((CATiledLayer *)self.layer).levelsOfDetailBias = 3;			// we use (levelsOfDetail - 1) because we only need more detail when zoomed in, no less details when zoomed out
-}
-
-
-- (void)setArea:(CHChartArea *)area
-{
-	if (area != _area) {
-		_area = area;
-		
-		// set some properties
-		self.relFrame = area.frame;
-	}
 }
 
 
@@ -193,16 +173,9 @@
 - (void)positionInFrame:(CGRect)targetRect onView:(NSView *)aView pageSize:(CGSize)pageSize
 {
 	if (!CGRectIsEmpty(targetRect)) {
-		CGRect appliedRect = targetRect;
-		inParentRect = targetRect;
-		
-		appliedRect.origin.x += _relFrame.origin.x * appliedRect.size.width;
-		appliedRect.origin.y += _relFrame.origin.y * appliedRect.size.height;
-		appliedRect.size.width *= _relFrame.size.width;
-		appliedRect.size.height *= _relFrame.size.height;
-		
-		self.frame = appliedRect;						// will cause setNeedsDisplay to be set if the size changed
 		self.pageSize = pageSize;
+		inParentRect = targetRect;
+		[self reposition];
 		
 		[aView addSubview:self];
 	}
@@ -211,6 +184,24 @@
 	for (CHChartAreaView *area in _areas) {
 		area.pageView = _pageView;
 		[area positionInFrame:self.bounds onView:self pageSize:pageSize];
+	}
+}
+
+/**
+ *  This is usually called if the area's frame has changed
+ */
+- (void)reposition
+{
+	if (!CGRectIsEmpty(inParentRect)) {
+		CGRect appliedRect = inParentRect;
+		
+		CGRect relFrame = _area.frame;
+		appliedRect.origin.x += relFrame.origin.x * appliedRect.size.width;
+		appliedRect.origin.y += relFrame.origin.y * appliedRect.size.height;
+		appliedRect.size.width *= relFrame.size.width;
+		appliedRect.size.height *= relFrame.size.height;
+		
+		self.frame = appliedRect;						// will cause setNeedsDisplay to be set if the size changed
 	}
 }
 
@@ -275,12 +266,13 @@
 		[super setFrame:frameRect];
 		
 		// update relative frame
-		_relFrame.origin.x = frameRect.origin.x / inParentRect.size.width;
-		_relFrame.origin.y = frameRect.origin.y / inParentRect.size.height;
-		_relFrame.size.width = frameRect.size.width / inParentRect.size.width;
-		_relFrame.size.height = frameRect.size.height / inParentRect.size.height;
+		CGRect relFrame = CGRectZero;
+		relFrame.origin.x = frameRect.origin.x / inParentRect.size.width;
+		relFrame.origin.y = frameRect.origin.y / inParentRect.size.height;
+		relFrame.size.width = frameRect.size.width / inParentRect.size.width;
+		relFrame.size.height = frameRect.size.height / inParentRect.size.height;
 		
-		self.area.frame = _relFrame;
+		self.area.frame = relFrame;
 	}
 }
 
@@ -406,7 +398,7 @@
 	[NSGraphicsContext saveGraphicsState];
 	
 	if (self.active) {
-		[[NSColor colorWithDeviceRed:0.f green:1.f blue:0.f alpha:0.25f] setFill];
+		[[NSColor colorWithDeviceRed:0.f green:1.f blue:0.f alpha:0.4f] setFill];
 	}
 	else {
 		[[NSColor colorWithDeviceRed:0.f green:0.f blue:1.f alpha:0.25f] setFill];
@@ -429,7 +421,7 @@
 #pragma mark - Utilities
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%@ <%p> %@, %d sub-areas", NSStringFromClass([self class]), self, NSStringFromCGRect(_relFrame), (int)[_areas count]];
+	return [NSString stringWithFormat:@"%@ <%p> %@, %d sub-areas", NSStringFromClass([self class]), self, NSStringFromCGRect(_area.frame), (int)[_areas count]];
 }
 
 

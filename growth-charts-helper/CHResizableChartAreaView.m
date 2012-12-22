@@ -89,6 +89,42 @@
 
 
 
+#pragma mark - Keyboard Handling
+- (void)keyDown:(NSEvent *)theEvent
+{
+	[self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
+}
+
+-(void)moveUp:(id)sender
+{
+	CGRect frame = self.frame;
+	frame.origin.y += 1.f;
+	self.frame = frame;
+}
+
+- (void)moveLeft:(id)sender
+{
+	CGRect frame = self.frame;
+	frame.origin.x -= 1.f;
+	self.frame = frame;
+}
+
+- (void)moveRight:(id)sender
+{
+	CGRect frame = self.frame;
+	frame.origin.x += 1.f;
+	self.frame = frame;
+}
+
+- (void)moveDown:(id)sender
+{
+	CGRect frame = self.frame;
+	frame.origin.y -= 1.f;
+	self.frame = frame;
+}
+
+
+
 #pragma mark - Mouse Handling
 - (void)mouseEntered:(NSEvent *)theEvent
 {
@@ -111,19 +147,19 @@
 	if (self.active && NSPointInRect(location, self.bounds)) {
 		NSSize mySize = self.bounds.size;
 		
-		if (location.x < 3.f) {								// resize left
+		if (location.x < 5.f) {								// resize left
 			mouseActionEffect = -1;
 			[[NSCursor resizeLeftRightCursor] set];
 		}
-		else if (location.x > mySize.width - 3.f) {			// resize right
+		else if (location.x > mySize.width - 5.f) {			// resize right
 			mouseActionEffect = 1;
 			[[NSCursor resizeLeftRightCursor] set];
 		}
-		else if (location.y < 3.f) {						// resize bottom
+		else if (location.y < 5.f) {						// resize bottom
 			mouseActionEffect = -2;
 			[[NSCursor resizeUpDownCursor] set];
 		}
-		else if (location.y > mySize.height - 3.f) {		// resize right
+		else if (location.y > mySize.height - 5.f) {		// resize right
 			mouseActionEffect = 2;
 			[[NSCursor resizeUpDownCursor] set];
 		}

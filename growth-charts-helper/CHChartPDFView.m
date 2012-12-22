@@ -39,6 +39,13 @@
 @implementation CHChartPDFView
 
 
+- (void)dealloc
+{
+	self.activeArea = nil;
+}
+
+
+
 #pragma mark - PDF Drawing
 /**
  *  Called after the page has been drawn
@@ -111,7 +118,9 @@
 {
 	if (activeArea != _activeArea) {
 		_activeArea.active = NO;
+		[self willChangeValueForKey:@"activeArea"];
 		_activeArea = activeArea;
+		[self didChangeValueForKey:@"activeArea"];
 		_activeArea.active = YES;
 	}
 }
@@ -130,6 +139,7 @@
 	if (currentTopmost != topmost) {
 		[topmost removeFromSuperview];
 		[[currentTopmost superview] addSubview:topmost positioned:NSWindowAbove relativeTo:currentTopmost];
+		[areaView makeFirstResponder];
 	}
 }
 

@@ -214,6 +214,7 @@
 	}
 	
 	// basic properties
+	_type = [_type lowercaseString];
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:_type forKey:@"type"];
 	if (_topmost && _page > 0) {
 		[dict setObject:[NSNumber numberWithUnsignedInteger:_page] forKey:@"page"];
@@ -286,7 +287,13 @@
 
 - (NSString *)frameString
 {
-	return NSStringFromCGRect(_frame);
+	//return NSStringFromCGRect(_frame);
+	NSNumber *x = [NSNumber numberWithFloat:_frame.origin.x];
+	NSNumber *y = [NSNumber numberWithFloat:_frame.origin.y];
+	NSNumber *w = [NSNumber numberWithFloat:_frame.size.width];
+	NSNumber *h = [NSNumber numberWithFloat:_frame.size.height];
+	
+	return [NSString stringWithFormat:@"{{%@,%@},{%@,%@}}", x, y, w, h];
 }
 
 
@@ -415,7 +422,30 @@
 
 
 
-#pragma mark - Utilities
+#pragma mark - Frame Utils
+- (void)setFrame:(CGRect)frame
+{
+	[self willChangeValueForKey:@"frame"];
+	[self willChangeValueForKey:@"frameOriginX"];
+	[self willChangeValueForKey:@"frameOriginY"];
+	[self willChangeValueForKey:@"frameSizeWidth"];
+	[self willChangeValueForKey:@"frameSizeHeight"];
+	
+	_frame = frame;
+	
+	// update our views
+	for (NSView *parentView in _knownViews) {
+		CHChartAreaView *myView = [_knownViews objectForKey:parentView];
+		[myView reposition];
+	}
+	
+	[self didChangeValueForKey:@"frame"];
+	[self didChangeValueForKey:@"frameOriginX"];
+	[self didChangeValueForKey:@"frameOriginY"];
+	[self didChangeValueForKey:@"frameSizeWidth"];
+	[self didChangeValueForKey:@"frameSizeHeight"];
+}
+
 - (CGFloat)frameOriginX
 {
 	return _frame.origin.x;
@@ -465,6 +495,8 @@
 }
 
 
+
+#pragma mark - Utilities
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"%@ <%p> type \"%@\", %d sub-areas", NSStringFromClass([self class]), self, _type, (int)[_areas count]];
