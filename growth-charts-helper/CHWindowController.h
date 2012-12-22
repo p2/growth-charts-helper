@@ -48,6 +48,8 @@
 - (void)loadPDFAt:(NSURL *)url;
 - (IBAction)handleFoundPDF:(id)sender;
 - (void)unloadPDF:(id)sender;
+- (IBAction)addArea:(id)sender;
+- (IBAction)removeArea:(id)sender;
 
 
 @end

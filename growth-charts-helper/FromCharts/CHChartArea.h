@@ -33,6 +33,7 @@
 @interface CHChartArea : NSObject <CHJSONHandling>
 
 @property (nonatomic, weak) CHChart *chart;					///< The chart to which we belong
+@property (nonatomic, weak) CHChartArea *parent;			///< Our parent area (if any)
 @property (nonatomic, copy) NSString *type;					///< The type of the area
 @property (nonatomic, copy) NSArray *outlinePoints;			///< An array of CGPoints (in NSValues) that define the path for our outline
 @property (nonatomic, copy) NSDictionary *dictionary;		///< The dictionary representation defining the receiver, kept around to spawn the view objects
@@ -62,7 +63,13 @@
 @property (nonatomic, assign) BOOL topmost;					///< YES if this area lies directly on the PDF, i.e. not nested in another area
 @property (nonatomic, copy) NSArray *areas;					///< An area can have any number of subareas
 
+- (NSString *)frameString;
+
+- (BOOL)hasViewForParent:(id)parentView;
 - (CHChartAreaView *)viewForParent:(id)parentView;
+
+- (void)addArea:(CHChartArea *)newArea;
+- (void)remove;
 
 + (NSCharacterSet *)outlinePathSplitSet;
 

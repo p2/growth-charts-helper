@@ -28,9 +28,6 @@
 
 @interface CHChartAreaView () {
 	CGRect inParentRect;
-	
-	BOOL clickStartedInside;
-	BOOL clickDidMove;
 }
 
 @end
@@ -186,7 +183,7 @@
 
 
 
-#pragma mark - Sizing
+#pragma mark - Adding to Views
 /**
  *  This translates our relative position information into an actual frame within the given view.
  *
@@ -217,7 +214,58 @@
 	}
 }
 
+- (CHChartAreaView *)didAddArea:(CHChartArea *)area
+{
+	if (!area) {
+		return nil;
+	}
+	
+	// already have it
+	for (CHChartAreaView *subarea in _areas) {
+		if ([subarea.area isEqual:area]) {
+			return subarea;
+		}
+	}
+	
+	// don't have it, make a view and add it to our array
+	CHChartAreaView *areaView = [area viewForParent:self];
+	areaView.pageView = _pageView;
+	if (!_areas) {
+		self.areas = @[areaView];
+	}
+	else {
+		self.areas = [_areas arrayByAddingObject:areaView];
+	}
+	
+	[areaView positionInFrame:self.bounds onView:self pageSize:_pageSize];
+	return areaView;
+}
 
+- (void)didRemoveArea:(CHChartArea *)area
+{
+	if ([_areas count] > 0) {
+		NSMutableArray *newAreas = [NSMutableArray arrayWithCapacity:[_areas count] - 1];
+		for (CHChartAreaView *sibling in _areas) {
+			if (sibling.area != area) {
+				[newAreas addObject:sibling];
+			}
+			else {
+				[sibling removeFromSuperview];
+			}
+		}
+		self.areas = ([newAreas count] > 0) ? newAreas : nil;
+	}
+}
+
+
+- (void)didBecomeFirstResponder
+{
+	[_pageView didBecomeFirstResponder:self];
+}
+
+
+
+#pragma mark - Sizing
 /**
  *  We override setFrame to update the relative frame when moving the box.
  */
@@ -300,52 +348,6 @@
 
 
 
-#pragma mark - First Responder
-- (BOOL)acceptsFirstResponder
-{
-    return (clickStartedInside && !clickDidMove);
-}
-
-/**
- *  Disregards mouse movements to make the object first responder anyway.
- */
-- (BOOL)makeFirstResponder
-{
-	clickStartedInside = YES;
-	clickDidMove = NO;
-	return [[self window] makeFirstResponder:self];
-}
-
-- (BOOL)becomeFirstResponder
-{
-	BOOL done = NO;
-	if ([self acceptsFirstResponder]) {
-		done = [super becomeFirstResponder];
-		_active = done;
-		[self setNeedsDisplay:YES];
-		
-		if (done) {
-			[self didBecomeFirstResponder];
-		}
-	}
-	return done;
-}
-
-- (void)didBecomeFirstResponder
-{
-	[_pageView didBecomeFirstResponder:self];
-}
-
-- (BOOL)resignFirstResponder
-{
-	BOOL done = [super resignFirstResponder];
-	_active = done ? NO : _active;
-	[self setNeedsDisplay:YES];
-	return done;
-}
-
-
-
 #pragma mark - Hit Detection
 /**
  *  Collect all areas that are hit by the given point, which is in the coordinate system of our parent (!!)
@@ -398,43 +400,12 @@
 
 
 
-#pragma mark - Mouse Handling
-- (void)mouseDown:(NSEvent *)theEvent
-{
-	clickStartedInside = YES;
-}
-
-- (void)mouseMoved:(NSEvent *)theEvent
-{
-	if (clickStartedInside) {
-		clickDidMove = YES;
-	}
-}
-
-- (void)mouseDragged:(NSEvent *)theEvent
-{
-	if (clickStartedInside) {
-		clickDidMove = YES;
-	}
-}
-
-- (void)mouseUp:(NSEvent *)theEvent
-{
-	if ([self acceptsFirstResponder]) {
-		[[self window] makeFirstResponder:self];
-	}
-	clickStartedInside = NO;
-	clickDidMove = NO;
-}
-
-
-
 #pragma mark - Drawing
 - (void)drawRect:(NSRect)dirtyRect
 {
 	[NSGraphicsContext saveGraphicsState];
 	
-	if (_active) {
+	if (self.active) {
 		[[NSColor colorWithDeviceRed:0.f green:1.f blue:0.f alpha:0.25f] setFill];
 	}
 	else {

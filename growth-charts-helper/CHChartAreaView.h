@@ -20,7 +20,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#import <Cocoa/Cocoa.h>
+#import "CHClickableView.h"
 #import <QuartzCore/QuartzCore.h>
 #import "CHChart.h"
 
@@ -39,7 +39,7 @@
  *
  *  @attention Override "drawLayer:inContext:" in subclasses, not "drawRect:"!
  */
-@interface CHChartAreaView : NSView
+@interface CHChartAreaView : CHClickableView
 
 @property (nonatomic, weak) CHChartArea *area;				///< The area model that describes the receiver
 
@@ -50,7 +50,6 @@
 @property (nonatomic, copy) NSArray *areas;					///< An area can have any number of subareas
 
 @property (nonatomic, weak) CHChartPDFView *pageView;		///< The PDFView we're residing in
-@property (nonatomic, assign) BOOL active;
 
 - (void)setFromDictionary:(NSDictionary *)dict;
 
@@ -59,6 +58,9 @@
 - (void)resetHighlight;
 
 - (void)positionInFrame:(CGRect)targetRect onView:(NSView *)aView pageSize:(CGSize)pageSize;
+- (CHChartAreaView *)didAddArea:(CHChartArea *)area;
+- (void)didRemoveArea:(CHChartArea *)area;
+
 - (CGRect)boundingBox;
 - (CGRect)framingBox;
 - (CGRect)outlineBox;
@@ -67,9 +69,6 @@
 - (void)updateWithDataSource:(id<CHChartDataSource>)dataSource;
 - (NSSet *)allDataTypes;
 - (NSSet *)plotDataTypes;
-
-- (BOOL)makeFirstResponder;
-- (void)didBecomeFirstResponder;
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(NSEvent *)event;
 - (NSSet *)areasAtPoint:(CGPoint)point;

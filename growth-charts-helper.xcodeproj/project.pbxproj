@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EE9408A616860CDA001FC955 /* CHClickableView.m in Sources */ = {isa = PBXBuildFile; fileRef = EE9408A516860CDA001FC955 /* CHClickableView.m */; };
 		EEAECBFE16815E2F00E8ABE1 /* CHRectToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = EEAECBFD16815E2F00E8ABE1 /* CHRectToStringTransformer.m */; };
 		EEAECC1716816B7800E8ABE1 /* CHFloatToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = EEAECC1616816B7800E8ABE1 /* CHFloatToStringTransformer.m */; };
 		EEAECC1A16816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = EEAECC1916816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m */; };
@@ -35,6 +36,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EE9408A416860CDA001FC955 /* CHClickableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHClickableView.h; sourceTree = "<group>"; };
+		EE9408A516860CDA001FC955 /* CHClickableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHClickableView.m; sourceTree = "<group>"; };
 		EEAECBFC16815E2F00E8ABE1 /* CHRectToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHRectToStringTransformer.h; sourceTree = "<group>"; };
 		EEAECBFD16815E2F00E8ABE1 /* CHRectToStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHRectToStringTransformer.m; sourceTree = "<group>"; };
 		EEAECC1516816B7800E8ABE1 /* CHFloatToStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHFloatToStringTransformer.h; sourceTree = "<group>"; };
@@ -142,11 +145,11 @@
 		EEEB2D7B1680E014004DC719 /* growth-charts-helper */ = {
 			isa = PBXGroup;
 			children = (
+				EEEB2DD71680FA95004DC719 /* CHWindowController.h */,
+				EEEB2DD81680FA95004DC719 /* CHWindowController.m */,
 				EEEB2D871680E014004DC719 /* CHDocument.h */,
 				EEEB2D881680E014004DC719 /* CHDocument.m */,
 				EEEB2D8A1680E014004DC719 /* CHDocument.xib */,
-				EEEB2DD71680FA95004DC719 /* CHWindowController.h */,
-				EEEB2DD81680FA95004DC719 /* CHWindowController.m */,
 				EEEB2DDE16810422004DC719 /* CHChartPDFView.h */,
 				EEEB2DDF16810422004DC719 /* CHChartPDFView.m */,
 				EEEB2DD21680EE70004DC719 /* CHChartAreaView.h */,
@@ -201,6 +204,8 @@
 			children = (
 				EEEB2DE31681075A004DC719 /* CHDropView.h */,
 				EEEB2DE41681075A004DC719 /* CHDropView.m */,
+				EE9408A416860CDA001FC955 /* CHClickableView.h */,
+				EE9408A516860CDA001FC955 /* CHClickableView.m */,
 				EEEB2DDA1680FFC7004DC719 /* CHEnumToNumberTransformer.h */,
 				EEEB2DDB1680FFC7004DC719 /* CHEnumToNumberTransformer.m */,
 				EEAECC1516816B7800E8ABE1 /* CHFloatToStringTransformer.h */,
@@ -297,6 +302,7 @@
 				EEAECC1716816B7800E8ABE1 /* CHFloatToStringTransformer.m in Sources */,
 				EEAECC1A16816C4500E8ABE1 /* CHDecimalNumberToStringTransformer.m in Sources */,
 				EEEFDEB11682737B005C4D17 /* CHResizableChartAreaView.m in Sources */,
+				EE9408A616860CDA001FC955 /* CHClickableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

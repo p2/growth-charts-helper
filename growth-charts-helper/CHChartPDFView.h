@@ -23,6 +23,7 @@
 #import <Quartz/Quartz.h>
 
 @class CHChart;
+@class CHChartArea;
 @class CHChartAreaView;
 
 
@@ -36,6 +37,9 @@
 
 - (void)layoutSubviews;
 - (void)didBecomeFirstResponder:(CHChartAreaView *)areaView;
+
+- (CHChartAreaView *)didAddArea:(CHChartArea *)area;
+- (void)didRemoveArea:(CHChartArea *)area;
 
 
 @end

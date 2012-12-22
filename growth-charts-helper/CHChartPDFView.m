@@ -107,28 +107,66 @@
 
 
 #pragma mark - Area Handling
-- (void)didBecomeFirstResponder:(CHChartAreaView *)areaView
-{
-	// do not go ahead if an area's superview is active
-	CHChartAreaView *superArea = areaView;
-	while ((superArea = (CHChartAreaView *)[superArea superview])) {
-		if (![superArea isKindOfClass:[CHChartAreaView class]]) {
-			break;
-		}
-		if (superArea.active) {
-			return;
-		}
-	}
-	
-	// alright, make this the active area
-	self.activeArea = areaView;
-}
-
 - (void)setActiveArea:(CHChartAreaView *)activeArea
 {
 	if (activeArea != _activeArea) {
+		_activeArea.active = NO;
 		_activeArea = activeArea;
-		[_activeArea makeFirstResponder];
+		_activeArea.active = YES;
+	}
+}
+
+- (void)didBecomeFirstResponder:(CHChartAreaView *)areaView
+{
+	self.activeArea = areaView;
+	
+	// make topmost view
+	CHChartAreaView *topmost = areaView;
+	while ([[topmost superview] isKindOfClass:[CHChartAreaView class]]) {
+		topmost = (CHChartAreaView *)[topmost superview];
+	}
+	
+	NSView *currentTopmost = [[[topmost superview] subviews] lastObject];
+	if (currentTopmost != topmost) {
+		[topmost removeFromSuperview];
+		[[currentTopmost superview] addSubview:topmost positioned:NSWindowAbove relativeTo:currentTopmost];
+	}
+}
+
+/**
+ *  We only handle top-level areas here.
+ */
+- (CHChartAreaView *)didAddArea:(CHChartArea *)area
+{
+	if (!area || area.parent) {
+		return nil;
+	}
+	
+	// place
+	NSView *docView = [self documentView];
+	PDFPage *currentPage = [self.document pageAtIndex:0];		// TODO: support multi-page docs
+	NSSize pageSize = [self rowSizeForPage:currentPage];
+	NSRect pageFrame = NSMakeRect(0.f, 0.f, pageSize.width, pageSize.height);
+	NSSize origSize = [currentPage boundsForBox:[self displayBox]].size;
+	
+	CHChartAreaView *areaView = [area viewForParent:self];
+	areaView.pageView = self;
+	[areaView positionInFrame:pageFrame onView:docView pageSize:origSize];
+	
+	// first responder and return
+	[areaView makeFirstResponder];
+	
+	return areaView;
+}
+
+/**
+ *  Removes the given area.
+ */
+- (void)didRemoveArea:(CHChartArea *)area
+{
+	if ([area hasViewForParent:self]) {
+		CHChartAreaView *areaView = [area viewForParent:self];
+		[areaView removeFromSuperview];
 	}
 }
 
@@ -143,6 +181,12 @@
 - (void)setCursorForAreaOfInterest:(PDFAreaOfInterest)area
 {
 //	[[NSCursor openHandCursor] set];
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	self.activeArea = nil;
+	[[self window] makeFirstResponder:self];
 }
 
 - (void)scrollWheel:(NSEvent *)event

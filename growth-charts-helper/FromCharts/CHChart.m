@@ -159,7 +159,10 @@
 	// add our areas
 	if ([_chartAreas count] > 0) {
 		NSMutableArray *areas = [NSMutableArray arrayWithCapacity:[_chartAreas count]];
-		for (CHChartArea *area in _chartAreas) {
+		
+		// we sort the area set so that versioned JSON files look the same as much as possible
+		NSSortDescriptor *rectSorter = [NSSortDescriptor sortDescriptorWithKey:@"frameString" ascending:NO];
+		for (CHChartArea *area in [_chartAreas sortedArrayUsingDescriptors:@[rectSorter]]) {
 			id obj = [area jsonObject];
 			if (obj) {
 				[areas addObject:obj];
@@ -195,6 +198,55 @@
 - (NSUInteger)numAreas
 {
 	return [_chartAreas count];
+}
+
+- (CHChartArea *)newAreaInParentArea:(CHChartArea *)parent
+{
+	CHChartArea *newArea = [CHChartArea new];
+	newArea.chart = self;
+	newArea.parent = parent;
+	newArea.frame = CGRectMake(0.25f, 0.25f, 0.5f, 0.5f);
+	newArea.type = @"text";
+	
+	[self addArea:newArea];
+	return newArea;
+}
+
+- (void)addArea:(CHChartArea *)area
+{
+	// it's a subarea
+	if (area.parent) {
+		[area.parent addArea:area];
+	}
+	
+	// root area
+	else {
+		area.topmost = YES;
+		if (_chartAreas) {
+			self.chartAreas = [_chartAreas setByAddingObject:area];
+		}
+		else {
+			self.chartAreas = [NSSet setWithObject:area];
+		}
+	}
+}
+
+- (void)removeArea:(CHChartArea *)area
+{
+	BOOL hadParent = (nil != area.parent);
+
+	[area remove];
+	
+	// root area, update area set
+	if (!hadParent) {
+		NSMutableSet *newAreas = [NSMutableSet setWithCapacity:[_chartAreas count] - 1];
+		for (CHChartArea *subarea in _chartAreas) {
+			if (area != subarea) {
+				[newAreas addObject:subarea];
+			}
+		}
+		self.chartAreas = newAreas;
+	}
 }
 
 

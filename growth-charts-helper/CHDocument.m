@@ -17,7 +17,7 @@
 - (id)init
 {
     if ((self = [super init])) {
-		// Add your subclass-specific initialization here.
+		self.hasUndoManager = YES;
     }
     return self;
 }

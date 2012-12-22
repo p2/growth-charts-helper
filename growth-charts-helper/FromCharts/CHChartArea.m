@@ -46,6 +46,21 @@
 }
 
 
+- (void)setChart:(CHChart *)chart
+{
+	if (chart != _chart) {
+		_chart = chart;
+		
+		// update sub-areas
+		for (CHChartArea *subarea in _areas) {
+			subarea.chart = _chart;
+		}
+	}
+}
+
+
+
+#pragma mark - JSON Handling
 /**
  *  Fill from a dictionary passed in from decoding JSON.
  */
@@ -170,6 +185,7 @@
 				CHChartArea *area = [CHChartArea newFromJSONObject:areaDict];
 				if (area) {
 					area.chart = _chart;
+					area.parent = self;
 					area.topmost = NO;
 					area.page = self.page;
 					[myAreas addObject:area];
@@ -189,6 +205,7 @@
 	return YES;
 }
 
+
 - (id)jsonObject
 {
 	if ([_type length] < 1) {
@@ -201,7 +218,7 @@
 	if (_topmost && _page > 0) {
 		[dict setObject:[NSNumber numberWithUnsignedInteger:_page] forKey:@"page"];
 	}
-	[dict setObject:NSStringFromCGRect(_frame) forKey:@"rect"];
+	[dict setObject:[self frameString] forKey:@"rect"];
 	
 	// the outline
 	if ([_outlinePoints count] > 2) {
@@ -267,18 +284,58 @@
 	return dict;
 }
 
-
-
-#pragma mark - KVC
-- (void)setChart:(CHChart *)chart
+- (NSString *)frameString
 {
-	if (chart != _chart) {
-		_chart = chart;
-		
-		// update sub-areas
-		for (CHChartArea *subarea in _areas) {
-			subarea.chart = _chart;
+	return NSStringFromCGRect(_frame);
+}
+
+
+
+#pragma mark - Subareas
+- (void)addArea:(CHChartArea *)newArea
+{
+	// assimilate
+	newArea.chart = _chart;
+	newArea.parent = self;
+	newArea.topmost = NO;
+	newArea.page = self.page;
+	
+	// add to array
+	if (!_areas) {
+		self.areas = @[newArea];
+	}
+	else {
+		self.areas = [_areas arrayByAddingObject:newArea];
+	}
+	
+	// tell our views
+	for (id forView in _knownViews) {
+		CHChartAreaView *myView = [_knownViews objectForKey:forView];
+		CHChartAreaView *newView = [myView didAddArea:newArea];
+		if ([[newView window] isKeyWindow]) {
+			[newView makeFirstResponder];
 		}
+	}
+}
+
+- (void)remove
+{
+	// remove our views
+	for (id forView in _knownViews) {
+		if ([forView respondsToSelector:@selector(didRemoveArea:)]) {
+			[forView performSelector:@selector(didRemoveArea:) withObject:self];
+		}
+	}
+	
+	// tell our parent to forget about us
+	if (_parent) {
+		NSMutableArray *newAreas = [NSMutableArray arrayWithCapacity:[_parent.areas count] - 1];
+		for (CHChartArea *sibling in _parent.areas) {
+			if (sibling != self) {
+				[newAreas addObject:sibling];
+			}
+		}
+		_parent.areas = ([newAreas count] > 0) ? newAreas : nil;
 	}
 }
 
@@ -286,6 +343,14 @@
 
 
 #pragma mark - Returning the View
+/**
+ *  Returns whether we hold a reference to a view in the given parent view.
+ */
+- (BOOL)hasViewForParent:(id)parentView
+{
+	return (nil != [_knownViews objectForKey:parentView]);
+}
+
 /**
  *  Returns a CHChartAreaView instance, newly created if not previously done for the parentView, from the properties of the receiver (including sub-areas).
  */

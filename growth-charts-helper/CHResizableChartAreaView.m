@@ -199,12 +199,4 @@
 }
 
 
-
-#pragma mark - First Responder
-- (void)didBecomeFirstResponder
-{
-	[super didBecomeFirstResponder];
-}
-
-
 @end

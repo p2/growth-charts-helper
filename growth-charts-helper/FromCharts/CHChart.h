@@ -11,6 +11,7 @@
 #import "CHJSONHandling.h"
 
 @class CHChart;
+@class CHChartArea;
 @class CHValue;
 @class PPRange;
 
@@ -64,7 +65,11 @@
 + (NSArray *)bundledCharts;
 
 - (NSURL *)resourceURL;
+
 - (NSUInteger)numAreas;
+- (CHChartArea *)newAreaInParentArea:(CHChartArea *)parent;
+- (void)addArea:(CHChartArea *)area;
+- (void)removeArea:(CHChartArea *)area;
 
 
 @end

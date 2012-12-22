@@ -63,6 +63,11 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didDropFiles:) name:CHDropViewDroppedItemsNotificationName object:nil];
 }
 
+- (NSUndoManager *)undoManager
+{
+	return [self pdfDocument].undoManager;
+}
+
 - (void)didDropFiles:(NSNotification *)notification
 {
 	NSArray *items = [[notification userInfo] objectForKey:CHDropViewDroppedItemsKey];
@@ -187,6 +192,12 @@
 	return [self pdfDocument].chart;
 }
 
+
+
+#pragma mark - Area Handling
+/**
+ *  We are observing _pdf.activeArea, so whenever that one changes we will also enter this method.
+ */
 - (void)setActiveArea:(CHChartArea *)activeArea
 {
 	if (activeArea != _activeArea) {
@@ -202,6 +213,30 @@
 		currentAreaIndex = sender.tag;
 		_pdf.activeArea = ((CHChartAreaView *)[_currentAreaStack objectAtIndex:currentAreaIndex]);
 	}
+}
+
+- (IBAction)addArea:(id)sender
+{
+	CHChartArea *newArea = [[self chart] newAreaInParentArea:_activeArea];
+	[_pdf didAddArea:newArea];		// we need to message this to the PDF View, sub-areas will auto-message their parent views (if there are any)
+	
+	// make undoable
+	[self.undoManager registerUndoWithTarget:[self chart] selector:@selector(removeArea:) object:newArea];
+}
+
+- (IBAction)removeArea:(id)sender
+{
+	if (!_activeArea) {
+		return;
+	}
+	
+	// make undoable
+	[self.undoManager registerUndoWithTarget:[self chart] selector:@selector(addArea:) object:_activeArea];
+	
+	// remove
+	CHChartArea *currArea = _activeArea;
+	[[self chart] removeArea:currArea];
+	[_pdf didRemoveArea:currArea];
 }
 
 
