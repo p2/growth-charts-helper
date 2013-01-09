@@ -33,7 +33,6 @@
  */
 @interface CHWindowController : NSWindowController <NSSplitViewDelegate>
 
-@property (nonatomic, readonly, weak) CHChart *chart;
 @property (nonatomic, readonly, weak) CHChartArea *activeArea;
 @property (nonatomic, readonly, strong) CHChartPDFView *pdf;
 

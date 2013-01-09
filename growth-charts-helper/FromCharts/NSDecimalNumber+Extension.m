@@ -67,4 +67,29 @@
 }
 
 
+
+#pragma mark - Comparison
+/**
+ *  @return The greater number of the receiver and the given number
+ */
+- (NSDecimalNumber *)greaterNumber:(NSDecimalNumber *)number
+{
+	if (NSOrderedAscending == [self compare:number]) {
+		return number;
+	}
+	return self;
+}
+
+/**
+ *  @return The smaller number of the receiver and the given number
+ */
+- (NSDecimalNumber *)smallerNumber:(NSDecimalNumber *)number
+{
+	if (NSOrderedDescending == [self compare:number]) {
+		return number;
+	}
+	return self;
+}
+
+
 @end

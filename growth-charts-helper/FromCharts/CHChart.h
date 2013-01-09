@@ -55,21 +55,29 @@
 @property (nonatomic, copy) NSString *sourceName;					///< The source name
 @property (nonatomic, copy) NSString *sourceAcronym;				///< The acronym for the source
 @property (nonatomic, copy) NSString *shortDescription;				///< A description of this chart
-@property (nonatomic, copy) NSString *resourceName;					///< The file name in our bundle, if available
 @property (nonatomic, copy) NSString *source;						///< Where this chart comes from, usually a URL
 @property (nonatomic, assign) CHGender gender;						///< The gender found on this chart
-@property (nonatomic, strong) PPRange *ageRange;					///< The age-range in months
 
 @property (nonatomic, strong) NSSet *chartAreas;					///< The areas on the chart that can show data (CHChartArea objects)
 
-+ (NSArray *)bundledCharts;
+@property (nonatomic, strong) NSURL *resourceURL;					///< The URL to a file in our bundle, if available
+@property (nonatomic, copy) NSString *resourceName;					///< The file name in our bundle, if available
 
-- (NSURL *)resourceURL;
+@property (nonatomic, copy) PPRange *ageRangeMonths;				///< The age-range in months
+@property (nonatomic, copy) PPRange *weightRangeKilogram;			///< The weight-range in kilogram
+@property (nonatomic, copy) PPRange *lengthRangeCentimeter;			///< The length-range in centimeter
+@property (nonatomic, copy) PPRange *hcRangeCentimeter;				///< The headcircumference-range in centimeter
+
++ (NSArray *)bundledCharts;
 
 - (NSUInteger)numAreas;
 - (CHChartArea *)newAreaInParentArea:(CHChartArea *)parent;
 - (void)addArea:(CHChartArea *)area;
 - (void)removeArea:(CHChartArea *)area;
+
+- (NSSet *)plotDataTypes;
+- (BOOL)hasAreaWithDataType:(NSString *)dataType;
+- (BOOL)plotsAreaWithDataType:(NSString *)dataType;
 
 
 @end

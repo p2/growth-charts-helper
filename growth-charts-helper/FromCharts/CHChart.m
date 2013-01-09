@@ -9,7 +9,9 @@
 #import "CHChart.h"
 #import "CHChartArea.h"
 #import "CHValue.h"
+#import "CHUnit.h"
 #import "PPRange.h"
+#import "NSDecimalNumber+Extension.h"
 
 
 @interface CHChart ()
@@ -101,7 +103,6 @@
 	if (_gender != CHGenderFemale && _gender != CHGenderMale) {
 		_gender = CHGenderUnknown;
 	}
-	self.ageRange = [PPRange rangeWithString:[dict objectForKey:@"ageRange"]];
 	
 	// find areas
 	NSArray *areas = [dict objectForKey:@"areas"];
@@ -152,9 +153,6 @@
 		[dict setObject:_shortDescription forKey:@"description"];
 	}
 	[dict setObject:[NSNumber numberWithInt:_gender] forKey:@"gender"];
-	if (_ageRange) {
-		[dict setObject:[_ageRange stringValue] forKey:@"ageRange"];
-	}
 	
 	// add our areas
 	if ([_chartAreas count] > 0) {
@@ -180,16 +178,19 @@
 #pragma mark - Chart Handling
 - (NSURL *)resourceURL
 {
-	// split the filename into name and extension
-	NSString *fileType = [_resourceName pathExtension];
-	NSString *fileName = [_resourceName stringByDeletingPathExtension];
-	
-	// grab the bundle resource
-	NSURL *url = [[NSBundle bundleForClass:[self class]] URLForResource:fileName withExtension:fileType];
-	if (!url) {
-		DLog(@"There is no bundled resource named \"%@\" of type \"%@\"", fileName, fileType);
+	if (!_resourceURL) {
+		// split the filename into name and extension
+		NSString *fileType = [_resourceName pathExtension];
+		NSString *fileName = [_resourceName stringByDeletingPathExtension];
+		
+		// grab the bundle resource
+		NSURL *url = [[NSBundle bundleForClass:[self class]] URLForResource:fileName withExtension:fileType];
+		if (!url) {
+			DLog(@"There is no bundled resource named \"%@\" of type \"%@\"", fileName, fileType);
+		}
+		self.resourceURL = url;
 	}
-	return url;
+	return _resourceURL;
 }
 
 
@@ -247,6 +248,103 @@
 		}
 		self.chartAreas = newAreas;
 	}
+}
+
+
+
+#pragma mark - Data Types
+/**
+ *  Returns a set with all data types that this chart can plot
+ */
+- (NSSet *)plotDataTypes
+{
+	NSMutableSet *used = [NSMutableSet setWithCapacity:2];
+	
+	for (CHChartArea *area in _chartAreas) {
+		[used unionSet:[area plotDataTypes]];
+	}
+	
+	return used;
+}
+
+/**
+ *  @return YES if the chart has at least one area with the given data type
+ */
+- (BOOL)hasAreaWithDataType:(NSString *)dataType
+{
+	for (CHChartArea *area in _chartAreas) {
+		if ([area hasDataType:dataType recursive:YES]) {
+			return YES;
+		}
+	}
+	
+	return NO;
+}
+
+/**
+ *  @return YES if at least one plot area plots the given data type;
+ */
+- (BOOL)plotsAreaWithDataType:(NSString *)dataType
+{
+	for (CHChartArea *area in _chartAreas) {
+		if ([area plotsDataType:dataType recursive:YES]) {
+			return YES;
+		}
+	}
+	
+	return NO;
+}
+
+
+/**
+ *  Creates a range from the minimum and maximum values for "age" plots that it finds in top-level (!) areas.
+ */
+- (PPRange *)ageRangeMonths
+{
+	if (!_ageRangeMonths) {
+		NSDecimalNumber *min = nil;
+		NSDecimalNumber *max = nil;
+		CHUnit *month = [CHUnit newWithPath:@"age.month"];
+		
+		// find plot areas
+		for (CHChartArea *area in _chartAreas) {
+			if ([@"plot" isEqualToString:area.type]) {
+				
+				// x axis
+				if ([@"age" isEqualToString:area.xAxisDataType]) {
+					CHUnit *xUnit = [CHUnit newWithPath:area.xAxisUnitName];
+					NSDecimalNumber *xMin = [xUnit convertNumber:[area.xAxisFrom smallerNumber:area.xAxisTo] toUnit:month];
+					NSDecimalNumber *xMax = [xUnit convertNumber:[area.xAxisFrom greaterNumber:area.xAxisTo] toUnit:month];
+					
+					if (!min || NSOrderedAscending == [xMin compare:min]) {
+						min = xMin;
+					}
+					
+					if (!max || NSOrderedDescending == [xMax compare:max]) {
+						max = xMax;
+					}
+				}
+				
+				// y axis
+				if ([@"age" isEqualToString:area.yAxisDataType]) {
+					CHUnit *yUnit = [CHUnit newWithPath:area.yAxisUnitName];
+					NSDecimalNumber *yMin = [yUnit convertNumber:[area.yAxisFrom smallerNumber:area.yAxisTo] toUnit:month];
+					NSDecimalNumber *yMax = [yUnit convertNumber:[area.yAxisFrom greaterNumber:area.yAxisTo] toUnit:month];
+					
+					if (!min || NSOrderedAscending == [yMin compare:min]) {
+						min = yMin;
+					}
+					
+					if (!max || NSOrderedDescending == [yMax compare:max]) {
+						max = yMax;
+					}
+				}
+			}
+		}
+		
+		self.ageRangeMonths = [PPRange rangeFrom:min to:max];
+	}
+	return _ageRangeMonths;
 }
 
 

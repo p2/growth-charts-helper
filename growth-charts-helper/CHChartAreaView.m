@@ -36,12 +36,6 @@
 @implementation CHChartAreaView
 
 
-- (void)dealloc
-{
-	CGPathRelease(_outline);
-}
-
-
 - (id)initWithFrame:(CGRect)frame
 {
 	if ((self = [super initWithFrame:frame])) {
@@ -52,46 +46,6 @@
 
 - (void)setup
 {
-}
-
-
-/**
- *  The chart area model keeps a dictionary around, subclasses of the view can override this method to receive more properties for its configuration.
- *  Don't forget to call super, the base implementation assigns origin and size!
- */
-- (void)setFromDictionary:(NSDictionary *)dict
-{
-	// outline path
-	NSString *outlineString = [dict objectForKey:@"outline"];
-	if ([outlineString isKindOfClass:[NSString class]]) {
-		NSArray *points = [outlineString componentsSeparatedByCharactersInSet:[[self class] outlinePathSplitSet]];
-		
-		// at least 3 points are required
-		if ([points count] > 2) {
-			CGMutablePathRef outlinePath = nil;
-			for (NSString *point in points) {
-				NSPoint p = NSPointFromString(point);
-				if (!outlinePath) {
-					outlinePath = CGPathCreateMutable();
-					CGPathMoveToPoint(outlinePath, NULL, p.x, p.y);
-				}
-				else {
-					CGPathAddLineToPoint(outlinePath, NULL, p.x, p.y);
-				}
-			}
-			
-			// store in ivar and clean up
-			CGPathCloseSubpath(outlinePath);
-			self.outline = CGPathCreateCopy(outlinePath);
-			CGPathRelease(outlinePath);
-		}
-		else {
-			DLog(@"For \"outline\", at least 3 points must be defined, we only got this: %@", points);
-		}
-	}
-	else if (outlineString) {
-		DLog(@"\"outline\" must be a NSString, but I got a %@, discarding", NSStringFromClass([outlineString class]));
-	}
 }
 
 
@@ -265,6 +219,11 @@
 	if (!NSEqualRects(self.frame, frameRect)) {
 		[super setFrame:frameRect];
 		
+		// make sure we have a parent rect
+		if (CGRectIsEmpty(inParentRect)) {
+			inParentRect = CGRectMake(0.f, 0.f, 1.f, 1.f);
+		}
+		
 		// update relative frame
 		CGRect relFrame = CGRectZero;
 		relFrame.origin.x = frameRect.origin.x / inParentRect.size.width;
@@ -314,7 +273,7 @@
  */
 - (CGRect)outlineBox
 {
-	if (_outline) {
+/*	if (_outline) {
 		CGSize mySize = [self bounds].size;
 		CGRect scaledOutline = CGPathGetBoundingBox(_outline);
 		scaledOutline.origin.x *= mySize.width;
@@ -323,7 +282,7 @@
 		scaledOutline.size.height *= mySize.height;
 		
 		return scaledOutline;
-	}
+ }	//	*/
 	return self.bounds;
 }
 
@@ -398,7 +357,7 @@
 	[NSGraphicsContext saveGraphicsState];
 	
 	if (self.active) {
-		[[NSColor colorWithDeviceRed:0.f green:1.f blue:0.f alpha:0.4f] setFill];
+		[[NSColor colorWithDeviceRed:0.f green:1.f blue:0.f alpha:0.5f] setFill];
 	}
 	else {
 		[[NSColor colorWithDeviceRed:0.f green:0.f blue:1.f alpha:0.25f] setFill];
@@ -406,6 +365,46 @@
 	
 	[NSBezierPath fillRect:self.bounds];
 	[NSGraphicsContext restoreGraphicsState];
+	
+	// the outline path
+	if (self.active && self.outline) {
+		[NSGraphicsContext saveGraphicsState];
+		
+		// transform to current size
+		NSRect bnds = self.bounds;
+		NSAffineTransform *transform = [NSAffineTransform transform];
+		[transform scaleXBy:bnds.size.width yBy:bnds.size.height];
+		NSBezierPath *outlinePath = [_outline copy];
+		[outlinePath transformUsingAffineTransform:transform];
+		
+		[outlinePath setClip];
+		[[NSColor colorWithDeviceRed:1.f green:0.f blue:0.f alpha:0.5f] setFill];
+		[NSBezierPath fillRect:bnds];
+		
+		[NSGraphicsContext restoreGraphicsState];
+	}
+}
+
+- (NSBezierPath *)outline
+{
+	if (!_outline) {
+		if ([self.area.outlinePoints count] > 0) {
+			NSBezierPath *path = nil;
+			for (NSValue *pointValue in self.area.outlinePoints) {
+				if (!path) {
+					path = [NSBezierPath new];
+					[path moveToPoint:[pointValue pointValue]];
+				}
+				else {
+					[path lineToPoint:[pointValue pointValue]];
+				}
+			}
+			
+			[path closePath];
+			self.outline = path;
+		}
+	}
+	return _outline;
 }
 
 

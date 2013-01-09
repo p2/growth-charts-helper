@@ -214,7 +214,6 @@
 	self.to = [_to decimalNumberByRoundingAccordingToBehavior:roundingBehavior];
 	
 }
-#pragma mark -
 
 
 
@@ -339,7 +338,7 @@
 				NSString *formatString = (PPRangeDisplayStyleSquareBrackets == style) ? @"[%@]" : @"%@";
 				return [NSString stringWithFormat:formatString, [_from stringValue]];
 			}
-			NSString *formatString = (PPRangeDisplayStyleSquareBrackets == style) ? @"[%@,%@]" : @"%@ – %@";
+			NSString *formatString = (PPRangeDisplayStyleSquareBrackets == style) ? @"[%@,%@]" : @"%@ - %@";
 			return [NSString stringWithFormat:formatString, [_from stringValue], [_to stringValue]];
 		}
 		

@@ -19,5 +19,7 @@
 - (NSDecimalNumber *)decimalPlaces;
 - (NSDecimalNumber *)absoluteNumber;
 
+- (NSDecimalNumber *)greaterNumber:(NSDecimalNumber *)number;
+- (NSDecimalNumber *)smallerNumber:(NSDecimalNumber *)number;
 
 @end

@@ -32,7 +32,6 @@
 	NSUInteger currentAreaIndex;
 }
 
-@property (nonatomic, readwrite, weak) CHChart *chart;
 @property (nonatomic, readwrite, weak) CHChartArea *activeArea;
 @property (nonatomic, readwrite, strong) CHChartPDFView *pdf;
 
@@ -138,7 +137,7 @@
 		
 	PDFDocument *pdfDoc = [[PDFDocument alloc] initWithURL:url];
 	_pdf.document = pdfDoc;
-	_pdf.chart = self.chart;
+	_pdf.chart = [self pdfDocument].chart;
 	
 	// add as subview
 	_pdf.frame = _leftPane.bounds;
@@ -149,6 +148,9 @@
 	// update button
 	_pdfFoundButton.title = @"Unload PDF";
 	[_pdfFoundButton setEnabled:YES];
+	
+	// if we don't yet have a JSON document, use the PDF name as JSON name
+	[[self pdfDocument] didLoadPDFAtURL:url];
 }
 
 - (IBAction)handleFoundPDF:(id)sender
@@ -204,16 +206,12 @@
 
 
 #pragma mark - Chart Handling
-- (void)setDocument:(NSDocument *)document
-{
-	[super setDocument:document];
-	self.chart = [self pdfDocument].chart;
-}
-
 - (CHDocument *)pdfDocument
 {
 	return (CHDocument *)self.document;
 }
+
+
 
 
 
@@ -259,7 +257,7 @@
 
 - (IBAction)addArea:(id)sender
 {
-	CHChartArea *newArea = [[self chart] newAreaInParentArea:_activeArea];
+	CHChartArea *newArea = [[self pdfDocument].chart newAreaInParentArea:_activeArea];
 	[self doAddArea:newArea];
 }
 
@@ -286,7 +284,7 @@
 	[self.undoManager registerUndoWithTarget:self selector:@selector(doAddArea:) object:area];
 	
 	// remove
-	[[self chart] removeArea:area];
+	[[self pdfDocument].chart removeArea:area];
 	[_pdf didRemoveArea:area];
 }
 

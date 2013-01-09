@@ -66,7 +66,7 @@
 	NSSet *areas = _chart.chartAreas;
 	if ([areas count] > 0) {
 		for (CHChartArea *area in areas) {
-			if (pageNum == area.page) {
+			if (!area.page || pageNum == area.page) {
 				CHChartAreaView *areaView = [area viewForParent:self];
 				areaView.pageView = self;
 				[areaView positionInFrame:pageFrame onView:docView pageSize:origSize];
@@ -232,7 +232,7 @@
 {
 	if (!_zoomOut) {
 		self.zoomOut = [[NSButton alloc] initWithFrame:NSMakeRect(0.f, 0.f, 39.f, 38.f)];
-		//[_zoomIn setAutoresizingMask:NSViewMinXMargin];
+		//[_zoomOut setAutoresizingMask:NSViewMinXMargin];
 		[_zoomOut setButtonType:NSMomentaryPushInButton];
 		[_zoomOut setBezelStyle:NSCircularBezelStyle];
 		[_zoomOut setTitle:@"-"];

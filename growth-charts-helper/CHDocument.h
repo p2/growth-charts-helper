@@ -19,6 +19,7 @@
 @property (nonatomic, strong) CHChart *chart;
 
 - (NSURL *)pdfWithSameName;
+- (void)didLoadPDFAtURL:(NSURL *)pdfURL;
 
 
 @end

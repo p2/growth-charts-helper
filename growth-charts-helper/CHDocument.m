@@ -26,12 +26,11 @@
 {
 	CHWindowController *controller = [[CHWindowController alloc] initWithWindowNibName:@"CHDocument"];
 	[self addWindowController:controller];
-}
-
-- (void)windowControllerDidLoadNib:(NSWindowController *)aController
-{
-	[super windowControllerDidLoadNib:aController];
-	// Add any code here that needs to be executed once the windowController has loaded the document's window.
+	
+	// if we created a new document, we don't yet have a chart, create one
+	if (!_chart) {
+		self.chart = [CHChart new];
+	}
 }
 
 + (BOOL)autosavesInPlace
@@ -42,6 +41,15 @@
 
 
 #pragma mark - Chart Handling
+- (void)setChart:(CHChart *)chart
+{
+	if (chart != _chart) {
+		[self willChangeValueForKey:@"chart"];
+		_chart = chart;
+		[self didChangeValueForKey:@"chart"];
+	}
+}
+
 /**
  *  When loading a JSON, looks if there is a PDF with the same name in that directory, and returns the URL.
  */
@@ -61,12 +69,34 @@
 	return nil;
 }
 
+/**
+ *  We call this when we load a PDF; if the document does not yet have a name, we use the PDF name.
+ */
+- (void)didLoadPDFAtURL:(NSURL *)pdfURL
+{
+	if (!pdfURL || [self fileURL]) {
+		return;
+	}
+	
+	// set the document URL
+	NSString *fileName = [[pdfURL lastPathComponent] stringByDeletingPathExtension];
+	NSString *jsonName = [fileName stringByAppendingString:@".json"];
+	NSString *jsonPath = [[[pdfURL path] stringByDeletingLastPathComponent] stringByAppendingPathComponent:jsonName];
+	NSFileManager *fm = [NSFileManager defaultManager];
+	if ([fm fileExistsAtPath:jsonPath]) {
+		DLog(@"There already exists a JSON with the same name as this PDF at %@", jsonPath);
+	}
+	else {
+		self.fileURL = [NSURL fileURLWithPath:jsonPath];
+	}
+}
+
 
 
 #pragma mark - File Reading and Writing
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
-	if (![@"DocumentType" isEqualToString:typeName]) {
+	if (![@"Growth Chart JSON" isEqualToString:typeName]) {
 		if (NULL != outError) {
 			NSString *errorMessage = [NSString stringWithFormat:@"I don't know how to write data of type \"%@\"", typeName];
 			NSDictionary *info = @{NSLocalizedDescriptionKey: errorMessage};
@@ -93,7 +123,7 @@
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
-	if (![@"DocumentType" isEqualToString:typeName]) {
+	if (![@"Growth Chart JSON" isEqualToString:typeName]) {
 		if (NULL != outError) {
 			NSString *errorMessage = [NSString stringWithFormat:@"I don't know how to read data of type \"%@\"", typeName];
 			NSDictionary *info = @{NSLocalizedDescriptionKey: errorMessage};

@@ -100,8 +100,12 @@
 	// frame
 	NSString *rectString = [dict objectForKey:@"rect"];
 	if ([rectString isKindOfClass:[NSString class]]) {
+#if TARGET_OS_IPHONE
+		self.frame = CGRectFromString(rectString);
+#else
 		NSRect rect = NSRectFromString(rectString);
 		self.frame = CGRectMake(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+#endif
 	}
 	else if (rectString) {
 		DLog(@"\"rect\" must be a string, but I got a %@, discarding", NSStringFromClass([rectString class]));
@@ -111,13 +115,21 @@
 	NSString *outlineString = [dict objectForKey:@"outline"];
 	if ([outlineString isKindOfClass:[NSString class]]) {
 		NSArray *points = [outlineString componentsSeparatedByCharactersInSet:[[self class] outlinePathSplitSet]];
-		if ([points count] > 0) {
+		if ([points count] > 2) {
 			NSMutableArray *outPoints = [NSMutableArray arrayWithCapacity:[points count]];
 			for (NSString *pointStr in points) {
+#if TARGET_OS_IPHONE
+				CGPoint point = CGPointFromString(pointStr);
+				[outPoints addObject:[NSValue valueWithCGPoint:point]];
+#else
 				NSPoint point = NSPointFromString(pointStr);
 				[outPoints addObject:[NSValue valueWithPoint:point]];
+#endif
 			}
 			self.outlinePoints = outPoints;
+		}
+		else {
+			DLog(@"\"outline\" must describe 3 or more points, but I got this: \"%@\"", outlineString);
 		}
 	}
 	else if (outlineString) {
@@ -225,7 +237,11 @@
 	if ([_outlinePoints count] > 2) {
 		NSMutableArray *points = [NSMutableArray arrayWithCapacity:[_outlinePoints count]];
 		for (NSValue *point in _outlinePoints) {
+#if TARGET_OS_IPHONE
+			[points addObject:NSStringFromCGPoint([point CGPointValue])];
+#else
 			[points addObject:NSStringFromCGPoint([point pointValue])];
+#endif
 		}
 		NSString *pointString = [points componentsJoinedByString:@";"];
 		if ([pointString length] > 0) {
@@ -294,6 +310,115 @@
 	NSNumber *h = [NSNumber numberWithFloat:_frame.size.height];
 	
 	return [NSString stringWithFormat:@"{{%@,%@},{%@,%@}}", x, y, w, h];
+}
+
+
+
+#pragma mark - Data Types
+/**
+ *  Returns a set with all data types that we plot.
+ */
+- (NSSet *)plotDataTypes
+{
+	NSMutableSet *used = nil;
+	
+	// we are a plot area
+	if ([@"plot" isEqualToString:_type]) {
+		used = [NSMutableSet setWithCapacity:2];
+		
+		if (_xAxisDataType) {
+			[used addObject:_xAxisDataType];
+		}
+		if (_yAxisDataType) {
+			[used addObject:_yAxisDataType];
+		}
+	}
+	
+	// we have sub-areas
+	if ([_areas count] > 0) {
+		if (!used) {
+			used = [NSMutableSet setWithCapacity:2];
+		}
+		
+		for (CHChartArea *subarea in _areas) {
+			[used unionSet:[subarea plotDataTypes]];
+		}
+	}
+	
+	return used;
+}
+
+/**
+ *  Indicates whether the area (or any subarea, if recursive is set) represents the given data type.
+ */
+- (BOOL)hasDataType:(NSString *)dataType recursive:(BOOL)recursive
+{
+	if ([dataType length] < 1) {
+		return NO;
+	}
+	
+	// our types
+	if (_dataType) {
+		if ([dataType isEqualToString:_dataType]) {
+			return YES;
+		}
+	}
+	if (_xAxisDataType) {
+		if ([dataType isEqualToString:_xAxisDataType]) {
+			return YES;
+		}
+	}
+	if (_yAxisDataType) {
+		if ([dataType isEqualToString:_yAxisDataType]) {
+			return YES;
+		}
+	}
+	
+	// not found, check subareas?
+	if (recursive) {
+		for (CHChartArea *subarea in _areas) {
+			if ([subarea hasDataType:dataType recursive:YES]) {
+				return YES;
+			}
+		}
+	}
+	
+	return NO;
+}
+
+/**
+ *  Indicates whether the area (or any subarea, if recursive is set) PLOTS the given data type.
+ */
+- (BOOL)plotsDataType:(NSString *)dataType recursive:(BOOL)recursive
+{
+	if ([dataType length] < 1) {
+		return NO;
+	}
+	
+	// make sure we are a plot area and check our axes
+	if ([@"plot" isEqualToString:_type]) {
+		if (_xAxisDataType) {
+			if ([dataType isEqualToString:_xAxisDataType]) {
+				return YES;
+			}
+		}
+		if (_yAxisDataType) {
+			if ([dataType isEqualToString:_yAxisDataType]) {
+				return YES;
+			}
+		}
+	}
+	
+	// not found, check subareas?
+	if (recursive) {
+		for (CHChartArea *subarea in _areas) {
+			if ([subarea plotsDataType:dataType recursive:YES]) {
+				return YES;
+			}
+		}
+	}
+	
+	return NO;
 }
 
 
@@ -434,7 +559,7 @@
 	_frame = frame;
 	
 	// update our views
-	for (NSView *parentView in _knownViews) {
+	for (id parentView in _knownViews) {
 		CHChartAreaView *myView = [_knownViews objectForKey:parentView];
 		[myView reposition];
 	}

@@ -71,6 +71,10 @@
 - (void)addArea:(CHChartArea *)newArea;
 - (void)remove;
 
+- (NSSet *)plotDataTypes;
+- (BOOL)hasDataType:(NSString *)dataType recursive:(BOOL)recursive;
+- (BOOL)plotsDataType:(NSString *)dataType recursive:(BOOL)recursive;
+
 + (NSCharacterSet *)outlinePathSplitSet;
 
 

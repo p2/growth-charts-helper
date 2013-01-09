@@ -30,27 +30,17 @@
 
 /**
  *  A chart area represents an area on a PDF file to draw content into.
- *
- *  Use one of its subclasses, they are more useful than this abstract superclass.
- *
- *  You can use the chart area as a standard view, adding it to a superview and have it draw the items into its context when the area is drawn, or use it
- *  manually by not adding it to a view hierarchy and calling its drawing methods with your own context. We do this with CHChartPlotAreas from CHChartPage so
- *  the area can also display data points that lie outside its borders.
- *
- *  @attention Override "drawLayer:inContext:" in subclasses, not "drawRect:"!
  */
 @interface CHChartAreaView : CHClickableView
 
 @property (nonatomic, weak) CHChartArea *area;				///< The area model that describes the receiver
 
-@property (nonatomic, assign) CGPathRef outline;			///< The outline of the area. We do *not* clip to this area, but you can use it to do so.
+@property (nonatomic, strong) NSBezierPath *outline;		///< The outline of the area
 @property (nonatomic, assign) CGSize pageSize;				///< The size of the page we're currently displayed on, in screen pixels
 
 @property (nonatomic, copy) NSArray *areas;					///< An area can have any number of subareas
 
 @property (nonatomic, weak) CHChartPDFView *pageView;		///< The PDFView we're residing in
-
-- (void)setFromDictionary:(NSDictionary *)dict;
 
 - (void)setup;
 - (void)reset;
