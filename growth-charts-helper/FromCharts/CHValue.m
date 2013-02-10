@@ -26,6 +26,18 @@
 
 #pragma mark - Properties
 /**
+ *  Checks whether the measurement seems physiologically plausible; 0 is plausible, -1 too low and 1 too high.
+ */
+- (NSInteger)checkPlausibility
+{
+	if (!_number || !_unit) {
+		return 0;
+	}
+	
+	return [_unit checkPlausibilityOfNumber:_number];
+}
+
+/**
  *  Returns YES if we don't have a number assigned, but *not* if we are zero (!).
  */
 - (BOOL)isNull
@@ -38,7 +50,7 @@
 #pragma mark - Conversion
 - (BOOL)convertToUnit:(CHUnit *)aUnit
 {
-	NSDecimalNumber *newNumber = _unit ? [_unit convertNumber:_number toUnit:aUnit] : _number;
+	NSDecimalNumber *newNumber = (_unit && aUnit) ? [_unit convertNumber:_number toUnit:aUnit] : _number;
 	if (_number && !newNumber) {
 		return NO;
 	}
@@ -49,6 +61,28 @@
 	return YES;
 }
 
+/**
+ *  @return A copy of the receiver, converted to the given unit
+ */
+- (CHValue *)valueInUnit:(CHUnit *)aUnit
+{
+	NSDecimalNumber *newNumber = (_unit && aUnit) ? [_unit convertNumber:_number toUnit:aUnit] : _number;
+	if (_number && !newNumber) {
+		return nil;
+	}
+	
+	return [[self class] newWithNumber:newNumber inUnit:aUnit];
+}
+
+- (CHValue *)valueInUnitWithName:(NSString *)unitName
+{
+	CHUnit *otherUnit = [CHUnit newWithPath:[NSString stringWithFormat:@"%@.%@", _unit.dimension, unitName]];
+	return [self valueInUnit:otherUnit];
+}
+
+/**
+ *  @return A number in the given unit, calculated from the receiver's number and unit
+ */
 - (NSDecimalNumber *)numberInUnit:(CHUnit *)aUnit
 {
 	return [_unit convertNumber:_number toUnit:aUnit];

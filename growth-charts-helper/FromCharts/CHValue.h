@@ -24,6 +24,8 @@
 + (id)newWithNumber:(NSDecimalNumber *)number inUnit:(CHUnit *)unit;
 
 - (BOOL)convertToUnit:(CHUnit *)aUnit;
+- (CHValue *)valueInUnit:(CHUnit *)aUnit;
+- (CHValue *)valueInUnitWithName:(NSString *)unitName;
 
 - (NSDecimalNumber *)numberInUnit:(CHUnit *)aUnit;
 - (NSDecimalNumber *)numberInUnitWithName:(NSString *)unitName;
@@ -31,6 +33,7 @@
 - (NSString *)stringValue;
 - (NSString *)stringValueWithSize:(CHValueStringSize)size;
 
+- (NSInteger)checkPlausibility;
 - (BOOL)isNull;
 
 

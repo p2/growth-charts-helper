@@ -47,7 +47,8 @@
  */
 + (PPRange *)rangeFromString:(NSString *)min toString:(NSString *)max
 {
-	return [PPRange rangeFrom:[NSDecimalNumber decimalNumberWithString:min] to:[NSDecimalNumber decimalNumberWithString:max]];
+	return [PPRange rangeFrom:(min ? [NSDecimalNumber decimalNumberWithString:min] : nil)
+						   to:(max ? [NSDecimalNumber decimalNumberWithString:max] : nil)];
 }
 
 /**

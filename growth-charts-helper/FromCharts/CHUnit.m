@@ -14,57 +14,6 @@
 
 
 /**
- *	You really should use this method to create new unit instances!
- *  @param aPath The unit path in the form "dimension.unitname"
- */
-+ (id)newWithPath:(NSString *)aPath
-{
-	NSArray *parts = [aPath componentsSeparatedByString:@"."];
-	if (2 == [parts count]) {
-		NSString *dimension = [parts objectAtIndex:0];
-		NSString *name = [parts objectAtIndex:1];
-		
-		// instantiate the correct class
-		NSDictionary *dimDict = [self dictionaryForDimension:dimension];
-		if (dimDict) {
-			NSString *baseName = [dimDict objectForKey:@"base"];
-			if ([baseName length] > 0) {
-				
-				// instantiate
-				Class class = [self classForDimension:dimension];
-				NSDictionary *dict = nil;
-				for (NSDictionary *unitDict in [dimDict objectForKey:@"units"]) {
-					if ([name isEqualToString:[unitDict objectForKey:@"name"]]) {
-						dict = unitDict;
-						break;
-					}
-				}
-				
-				CHUnit *unit = [class new];
-				unit.dimension = dimension;
-				unit.name = name;
-				unit.label = [dict objectForKey:@"label"];
-				unit.baseMultiplier = [dict objectForKey:@"baseMultiplier"] ? [NSDecimalNumber decimalNumberWithString:[dict objectForKey:@"baseMultiplier"]] : nil;
-				unit.isBaseUnit = [baseName isEqualToString:name];
-				
-				return unit;
-			}
-			else {
-				DLog(@"There is no base unit for dimension %@", dimension);
-			}
-		}
-		else {
-			DLog(@"There is no definition of the dimension \"%@\" in units.plist", dimension);
-		}
-	}
-	else {
-		DLog(@"Failed to instantiate from path \"%@\", which should be in the form \"dimension.unitname\"", aPath);
-	}
-	
-	return nil;
-}
-
-/**
  *  This is the designated initializer.
  */
 - (id)init
@@ -174,11 +123,16 @@
 }
 
 /**
- *	Assumes that number is in the receivers unit and converts it to the given unit
- *	TODO: Implement
+ *  Assumes that number is in the receivers unit and converts it to the given unit.
  */
 - (NSDecimalNumber *)convertNumber:(NSDecimalNumber *)number toUnit:(CHUnit *)unit
 {
+	// no unit or same unit anyway?
+	if (!unit || [self isEqual:unit]) {
+		return number;
+	}
+	
+	// must be same dimension
 	if (![self isSameDimension:unit]) {
 		DLog(@"I can not convert to a unit from another dimension (%@ -> %@)", self.dimension, unit.dimension);
 		return nil;
@@ -189,7 +143,7 @@
 }
 
 /**
- *	Rounds the number according to the unit's information
+ *  Rounds the number according to the unit's information.
  */
 - (NSDecimalNumber *)roundedNumber:(NSDecimalNumber *)number
 {
@@ -207,7 +161,132 @@
 
 
 
+#pragma mark - Plausibility Testing
+/**
+ *  Checks whether a number in the receiver's unit physiologically makes sense.
+ */
+- (NSInteger)checkPlausibilityOfNumber:(NSDecimalNumber *)number
+{
+	if (!number || [number isEqual:[NSDecimalNumber notANumber]]) {
+		return 0;
+	}
+	
+	if (_plausibleMin && NSOrderedAscending == [number compare:_plausibleMin]) {
+		return -1;
+	}
+	if (_plausibleMax && NSOrderedDescending == [number compare:_plausibleMax]) {
+		return 1;
+	}
+	return 0;
+}
+
+- (void)setMinPlausibleFromBaseUnit:(NSString *)numString
+{
+	if ([numString length] < 1) {
+		return;
+	}
+	if (!_isBaseUnit && !_baseMultiplier) {
+		DLog(@"I need to know the base unit first");
+		return;
+	}
+	
+	NSDecimalNumber *number = [NSDecimalNumber decimalNumberWithString:numString];
+	self.plausibleMin = [self numberFromBaseUnit:number];
+}
+
+- (void)setMaxPlausibleFromBaseUnit:(NSString *)numString
+{
+	if ([numString length] < 1) {
+		return;
+	}
+	if (!_isBaseUnit && !_baseMultiplier) {
+		DLog(@"I need to know the base unit first");
+		return;
+	}
+	
+	NSDecimalNumber *number = [NSDecimalNumber decimalNumberWithString:numString];
+	self.plausibleMax = [self numberFromBaseUnit:number];
+}
+
+
+
 #pragma mark - Unit Loading
+/**
+ *  You really should use this method to create new unit instances!
+ *  @param aPath The unit path in the form "dimension.unitname"
+ */
++ (id)newWithPath:(NSString *)aPath
+{
+	NSArray *parts = [aPath componentsSeparatedByString:@"."];
+	if (2 == [parts count]) {
+		NSString *dimension = [parts objectAtIndex:0];
+		NSString *name = [parts objectAtIndex:1];
+		
+		// instantiate the correct class
+		NSDictionary *dimDict = [self dictionaryForDimension:dimension];
+		if (dimDict) {
+			NSString *baseName = [dimDict objectForKey:@"base"];
+			if ([baseName length] > 0) {
+				NSString *plausMin = [dimDict objectForKey:@"plausible-min"];
+				NSString *plausMax = [dimDict objectForKey:@"plausible-max"];
+				
+				// find the respective dictionary in the dimension's dictionary
+				Class class = [self classForDimension:dimension];
+				NSDictionary *dict = nil;
+				for (NSDictionary *unitDict in [dimDict objectForKey:@"units"]) {
+					if ([name isEqualToString:[unitDict objectForKey:@"name"]]) {
+						dict = unitDict;
+						break;
+					}
+				}
+				
+				// instantiate
+				CHUnit *unit = [class newFromDictionary:dict withName:name inDimension:dimension];
+				if (!unit) {
+					DLog(@"Could not instantiate a unit for \"%@\"", aPath);
+				}
+				
+				// set dimension properties
+				unit.isBaseUnit = [baseName isEqualToString:name];
+				[unit setMinPlausibleFromBaseUnit:plausMin];
+				[unit setMinPlausibleFromBaseUnit:plausMax];
+				
+				return unit;
+			}
+			else {
+				DLog(@"There is no base unit for dimension %@", dimension);
+			}
+		}
+		else {
+			DLog(@"There is no definition of the dimension \"%@\" in units.plist", dimension);
+		}
+	}
+	else if (aPath) {
+		DLog(@"Failed to instantiate from path \"%@\", which should be in the form \"dimension.unitname\"", aPath);
+	}
+	
+	return nil;
+}
+
+/**
+ *  Creates a new instance with the properties found in the dictionary.
+ */
++ (id)newFromDictionary:(NSDictionary *)dict withName:(NSString *)name inDimension:(NSString *)dimension
+{
+	if (!dimension && (!dict || !name)) {
+		return nil;
+	}
+	
+	CHUnit *unit = [self new];
+	unit.dimension = dimension;
+	unit.name = ([name length] > 0) ? name : [dict objectForKey:@"name"];
+	unit.label = [dict objectForKey:@"label"];
+	unit.baseMultiplier = [dict objectForKey:@"baseMultiplier"] ? [NSDecimalNumber decimalNumberWithString:[dict objectForKey:@"baseMultiplier"]] : nil;
+	
+	return unit;
+}
+
+
 /**
  *  Returns an array of all units for a given dimension.
  *  @param dimension The name of the dimension
@@ -220,23 +299,25 @@
 		Class class = [self classForDimension:dimension];
 		NSString *baseName = [dimDict objectForKey:@"base"];
 		if ([baseName length] > 0) {
+			NSString *plausMin = [dimDict objectForKey:@"plausible-min"];
+			NSString *plausMax = [dimDict objectForKey:@"plausible-max"];
 			NSArray *units = [dimDict objectForKey:@"units"];
 			NSMutableArray *arr = [NSMutableArray arrayWithCapacity:[units count]];
 			
 			// loop the dimension
 			for (NSDictionary *dict in units) {
-				CHUnit *unit = [class new];
-				unit.dimension = dimension;
-				unit.name = [dict objectForKey:@"name"];
-				unit.label = [dict objectForKey:@"label"];
-				unit.baseMultiplier = [dict objectForKey:@"baseMultiplier"] ? [NSDecimalNumber decimalNumberWithString:[dict objectForKey:@"baseMultiplier"]] : nil;
-				unit.isBaseUnit = [baseName isEqualToString:unit.name];
-				
-				[arr addObject:unit];
-				
-				// default?
-				if (unit.isBaseUnit && NULL != defaultUnit) {
-					*defaultUnit = unit;
+				CHUnit *unit = [class newFromDictionary:dict withName:nil inDimension:dimension];
+				if (unit) {
+					[arr addObject:unit];
+					
+					// default?
+					unit.isBaseUnit = [baseName isEqualToString:unit.name];
+					if (unit.isBaseUnit && NULL != defaultUnit) {
+						*defaultUnit = unit;
+					}
+					
+					[unit setMinPlausibleFromBaseUnit:plausMin];
+					[unit setMaxPlausibleFromBaseUnit:plausMax];
 				}
 			}
 			
@@ -249,6 +330,38 @@
 		DLog(@"There is no definition of the dimension \"%@\" in units.plist", dimension);
 	}
 	
+	return nil;
+}
+
+/**
+ *  Returns the appropriate units from the appropriate dimension for a given data type.
+ *  @todo Hardcoded, should move to plist
+ */
++ (NSArray *)unitsForDataType:(NSString *)dataType
+{
+	if ([@"bodyweight" isEqualToString:dataType]) {
+		return [self unitsOfDimension:@"weight" baseUnit:nil];
+	}
+	if ([@"bodylength" isEqualToString:dataType]) {
+		return [self unitsOfDimension:@"length" baseUnit:nil];
+	}
+	if ([@"headcircumference" isEqualToString:dataType]) {
+		NSMutableArray *lengthUnits = [[self unitsOfDimension:@"length" baseUnit:nil] mutableCopy];
+		CHUnit *meterUnit = nil;
+		for (CHUnit *unit in lengthUnits) {
+			if ([@"meter" isEqualToString:unit.name]) {
+				meterUnit = unit;
+				break;
+			}
+		}
+		[lengthUnits removeObject:meterUnit];
+		return lengthUnits;
+	}
+	if ([@"age" isEqualToString:dataType]) {
+		return [self unitsOfDimension:@"age" baseUnit:nil];
+	}
+	
+	DLog(@"No data type or none that we understand: %@", dataType);
 	return nil;
 }
 
@@ -282,7 +395,7 @@
 
 
 /**
- *	Assumes default units for some measurement types, e.g. "length.centimeter" for "bodylength"
+ *  Assumes default units for some measurement types, e.g. "length.centimeter" for "bodylength"
  */
 + (id)defaultUnitForDataType:(NSString *)measurementType
 {
@@ -294,6 +407,9 @@
 	}
 	if ([@"age" isEqualToString:measurementType]) {
 		return [self newWithPath:@"age.second"];
+	}
+	if ([@"bmi" isEqualToString:measurementType]) {
+		return [self newWithPath:@"bmi.kilogram-per-square-meter"];
 	}
 	
 	DLog(@"There is no default unit for \"%@\", returning an empty unit", measurementType);

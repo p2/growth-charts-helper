@@ -23,10 +23,15 @@
 @property (nonatomic, assign) short precision;						///< The default precision to round to, 2 by default
 @property (nonatomic, strong) NSDecimalNumber *baseMultiplier;		///< How to convert to base unit
 @property (nonatomic, assign) BOOL isBaseUnit;
+@property (nonatomic, strong) NSDecimalNumber *plausibleMin;
+@property (nonatomic, strong) NSDecimalNumber *plausibleMax;
+
 
 + (NSArray *)unitsOfDimension:(NSString *)dimension baseUnit:(CHUnit * __autoreleasing *)defaultUnit;
++ (NSArray *)unitsForDataType:(NSString *)dataType;
 
 + (id)newWithPath:(NSString *)aPath;
++ (id)newFromDictionary:(NSDictionary *)dict withName:(NSString *)name inDimension:(NSString *)dimension;
 - (NSString *)path;
 
 - (NSString *)stringValueForNumber:(NSDecimalNumber *)number;
@@ -37,6 +42,10 @@
 - (NSDecimalNumber *)roundedNumber:(NSDecimalNumber *)number;
 
 - (BOOL)isSameDimension:(CHUnit *)otherUnit;
+
+- (NSInteger)checkPlausibilityOfNumber:(NSDecimalNumber *)number;
+- (void)setMinPlausibleFromBaseUnit:(NSString *)numString;
+- (void)setMaxPlausibleFromBaseUnit:(NSString *)numString;
 
 + (NSDictionary *)dictionaryForDimension:(NSString *)dimension;
 + (Class)classForDimension:(NSString *)dimension;

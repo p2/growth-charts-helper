@@ -40,20 +40,28 @@
 }
 
 /**
- *	Reads "Charts.plist" from the main bundle and returns the charts contained therein
+ *  Finds all JSON files in the bundle, checks if they start with a given prefix, and assumes that those are charts if they do.
  */
 + (NSArray *)bundledCharts
 {
 	NSArray *bundled = [[NSBundle mainBundle] pathsForResourcesOfType:@"json" inDirectory:nil];
 	if ([bundled count] > 0) {
-		NSString *prefix = @"grchrt";
+		NSArray *prefixes = @[@"WHO.2006", @"CDC.2000"];
 		NSError *error = nil;
 		NSMutableArray *arr = [NSMutableArray arrayWithCapacity:[bundled count]];
 		for (NSString *path in bundled) {
 			
-			// for now, all our charts start with "grchrt", so let's use this as a filter
+			// check if they have one of our prefixes
 			NSString *file = [path lastPathComponent];
-			if (![prefix isEqualToString:[file substringToIndex:MIN([file length], [prefix length])]]) {
+			BOOL hasPrefix = NO;
+			for (NSString *prefix in prefixes) {
+				if ([prefix isEqualToString:[file substringToIndex:MIN([file length], [prefix length])]]) {
+					hasPrefix = YES;
+					break;
+				}
+			}
+			
+			if (!hasPrefix) {
 				continue;
 			}
 			
@@ -76,6 +84,27 @@
 				DLog(@"Error reading %@: %@", path, [error localizedDescription]);
 			}
 		}
+		
+		// sort by age, WHO first then by age range
+		[arr sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+			CHChart *chart1 = (CHChart *)obj1;
+			CHChart *chart2 = (CHChart *)obj2;
+			
+			NSComparisonResult acro = [chart2.sourceAcronym caseInsensitiveCompare:chart1.sourceAcronym];
+			if (NSOrderedSame != acro) {
+				return acro;
+			}
+			
+			// same source, order by age range
+			PPRange *range1 = chart1.ageRangeMonths;
+			PPRange *range2 = chart2.ageRangeMonths;
+			
+			NSComparisonResult lower = [range1.from compare:range2.from];
+			if (NSOrderedSame == lower) {
+				return [range1.to compare:range2.to];
+			}
+			return lower;
+		}];
 		
 		return arr;
 	}
