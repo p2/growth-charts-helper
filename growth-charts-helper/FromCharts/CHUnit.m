@@ -59,7 +59,7 @@
 
 #pragma mark - String Value
 /**
- *  Returns the string value for a number in the receiver's unit.
+ *  Returns the string value for a number and the unit label in the receiver's unit.
  *
  *  This method calls stringValueForNumber:withSize: with "CHValueStringSizeSmall" as parameter.
  */
@@ -69,12 +69,16 @@
 }
 
 /**
- *  Returns the string value for a number in the receiver's unit, with the given size.
+ *  Returns the string value for a number and the unit label in the receiver's unit, with the given size.
  *
  *  Subclasses should override this method.
  */
 - (NSString *)stringValueForNumber:(NSDecimalNumber *)number withSize:(CHValueStringSize)size
 {
+	if (!number) {
+		return nil;
+	}
+	
 	if (CHValueStringSizeCompact == size) {
 		return [NSString stringWithFormat:@"%@%@", [self roundedNumber:number], (_label ? _label : @"")];
 	}
@@ -83,6 +87,14 @@
 	}
 	
 	return [NSString stringWithFormat:@"%@ %@", [self roundedNumber:number], (_label ? _label : @"")];
+}
+
+/**
+ *  Returns the string value for a number in the receiver's unit, but the number only.
+ */
+- (NSString *)stringValueForNumberOnly:(NSDecimalNumber *)number
+{
+	return [[self roundedNumber:number] description];
 }
 
 
@@ -249,7 +261,7 @@
 				// set dimension properties
 				unit.isBaseUnit = [baseName isEqualToString:name];
 				[unit setMinPlausibleFromBaseUnit:plausMin];
-				[unit setMinPlausibleFromBaseUnit:plausMax];
+				[unit setMaxPlausibleFromBaseUnit:plausMax];
 				
 				return unit;
 			}
@@ -282,6 +294,10 @@
 	unit.name = ([name length] > 0) ? name : [dict objectForKey:@"name"];
 	unit.label = [dict objectForKey:@"label"];
 	unit.baseMultiplier = [dict objectForKey:@"baseMultiplier"] ? [NSDecimalNumber decimalNumberWithString:[dict objectForKey:@"baseMultiplier"]] : nil;
+	NSNumber *precision = [dict objectForKey:@"precision"];
+	if (precision) {
+		unit.precision = [precision shortValue];
+	}
 	
 	return unit;
 }
@@ -359,6 +375,9 @@
 	}
 	if ([@"age" isEqualToString:dataType]) {
 		return [self unitsOfDimension:@"age" baseUnit:nil];
+	}
+	if ([@"bmi" isEqualToString:dataType]) {
+		return [self unitsOfDimension:@"bmi" baseUnit:nil];
 	}
 	
 	DLog(@"No data type or none that we understand: %@", dataType);

@@ -36,6 +36,7 @@
 
 - (NSString *)stringValueForNumber:(NSDecimalNumber *)number;
 - (NSString *)stringValueForNumber:(NSDecimalNumber *)number withSize:(CHValueStringSize)size;
+- (NSString *)stringValueForNumberOnly:(NSDecimalNumber *)number;
 
 - (NSDecimalNumber *)numberInBaseUnit:(NSDecimalNumber *)number;
 - (NSDecimalNumber *)convertNumber:(NSDecimalNumber *)number toUnit:(CHUnit *)unit;

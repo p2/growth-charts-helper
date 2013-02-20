@@ -32,6 +32,7 @@
 
 - (NSString *)stringValue;
 - (NSString *)stringValueWithSize:(CHValueStringSize)size;
+- (NSString *)numericStringValue;
 
 - (NSInteger)checkPlausibility;
 - (BOOL)isNull;

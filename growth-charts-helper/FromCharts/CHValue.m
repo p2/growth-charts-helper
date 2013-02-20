@@ -118,6 +118,17 @@
 	return _number ? [_number stringValue] : @"";
 }
 
+/**
+ *  Returns a string for the numerical part of the value, usually rounded.
+ */
+- (NSString *)numericStringValue
+{
+	if (_unit) {
+		return [_unit stringValueForNumberOnly:_number];
+	}
+	return _number ? [_number stringValue] : @"";
+}
+
 
 
 #pragma mark - NSCopying
