@@ -18,6 +18,7 @@
 
 - (BOOL)makeFirstResponder;
 - (void)didBecomeFirstResponder;
+- (void)didResignFirstResponder;
 
 
 @end

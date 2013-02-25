@@ -24,11 +24,14 @@
 #import "CHChartArea.h"
 #import "CHChartPDFView.h"
 #import "CHResizableChartAreaView.h"		// our subclass
+#import "CHOutlineView.h"
 
 
 @interface CHChartAreaView () {
 	CGRect inParentRect;
 }
+
+@property (nonatomic, weak) CHOutlineView *outlineView;
 
 @end
 
@@ -203,9 +206,21 @@
 }
 
 
+
+#pragma mark - First Responder
 - (void)didBecomeFirstResponder
 {
 	[_pageView didBecomeFirstResponder:self];
+	[self addOutline];
+}
+
+- (void)didResignFirstResponder
+{
+	if (_outlineView) {
+		[_outlineView removeFromSuperview];
+		[_outlineView.superview setNeedsDisplayInRect:_outlineView.frame];
+		self.outlineView = nil;
+	}
 }
 
 
@@ -265,25 +280,6 @@
 	bounding.origin.y += frame.origin.y;
 	
 	return bounding;
-}
-
-/**
- *  A rect in our own coordinate system containing our outline, our bounds if we don't have one.
- *  @return The rect covering our outline, an empty rect if we don't have an outline
- */
-- (CGRect)outlineBox
-{
-/*	if (_outline) {
-		CGSize mySize = [self bounds].size;
-		CGRect scaledOutline = CGPathGetBoundingBox(_outline);
-		scaledOutline.origin.x *= mySize.width;
-		scaledOutline.origin.y *= mySize.height;
-		scaledOutline.size.width *= mySize.width;
-		scaledOutline.size.height *= mySize.height;
-		
-		return scaledOutline;
- }	//	*/
-	return self.bounds;
 }
 
 /**
@@ -351,7 +347,77 @@
 
 
 
+#pragma mark - Outline
+- (NSBezierPath *)outline
+{
+	if (!_outline) {
+		if ([self.area.outlinePoints count] > 0) {
+			NSBezierPath *path = nil;
+			
+			// create the path
+			for (NSValue *pointValue in self.area.outlinePoints) {
+				if (!path) {
+					path = [NSBezierPath new];
+					[path moveToPoint:[pointValue pointValue]];
+				}
+				else {
+					[path lineToPoint:[pointValue pointValue]];
+				}
+			}
+			
+			[path closePath];
+			
+			// flip it (it's upside down now)
+			NSAffineTransform *transform = [NSAffineTransform transform];
+			[transform scaleXBy:1.f yBy:-1.f];
+			[transform translateXBy:0.f yBy:-1.f];
+			
+			self.outline = [transform transformBezierPath:path];
+		}
+	}
+	return _outline;
+}
+
+- (void)addOutline
+{
+	return;
+	if (!_outlineView) {
+		CGRect outline = [self outlineBox];
+		if (!CGRectIsEmpty(outline)) {
+			CHOutlineView *slayer = [[CHOutlineView alloc] initWithFrame:outline];
+			slayer.outline = _outline;
+			slayer.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+			
+			[self addSubview:slayer];
+			self.outlineView = slayer;
+		}
+	}
+}
+
+/**
+ *  A rect in our own coordinate system containing our outline, our bounds if we don't have one.
+ *  @return The rect covering our outline, an empty rect if we don't have an outline
+ */
+- (CGRect)outlineBox
+{
+	if (self.outline) {
+		CGSize mySize = [self bounds].size;
+		CGRect scaledOutline = [_outline bounds];
+		scaledOutline.origin.x *= mySize.width;
+		scaledOutline.origin.y *= mySize.height;
+		scaledOutline.size.width *= mySize.width;
+		scaledOutline.size.height *= mySize.height;
+		
+		return scaledOutline;
+	}
+	
+	return CGRectZero;
+}
+
+
+
 #pragma mark - Drawing
+//- (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx
 - (void)drawRect:(NSRect)dirtyRect
 {
 	[NSGraphicsContext saveGraphicsState];
@@ -365,46 +431,6 @@
 	
 	[NSBezierPath fillRect:self.bounds];
 	[NSGraphicsContext restoreGraphicsState];
-	
-	// the outline path
-	if (self.active && self.outline) {
-		[NSGraphicsContext saveGraphicsState];
-		
-		// transform to current size
-		NSRect bnds = self.bounds;
-		NSAffineTransform *transform = [NSAffineTransform transform];
-		[transform scaleXBy:bnds.size.width yBy:bnds.size.height];
-		NSBezierPath *outlinePath = [_outline copy];
-		[outlinePath transformUsingAffineTransform:transform];
-		
-		[outlinePath setClip];
-		[[NSColor colorWithDeviceRed:1.f green:0.f blue:0.f alpha:0.5f] setFill];
-		[NSBezierPath fillRect:bnds];
-		
-		[NSGraphicsContext restoreGraphicsState];
-	}
-}
-
-- (NSBezierPath *)outline
-{
-	if (!_outline) {
-		if ([self.area.outlinePoints count] > 0) {
-			NSBezierPath *path = nil;
-			for (NSValue *pointValue in self.area.outlinePoints) {
-				if (!path) {
-					path = [NSBezierPath new];
-					[path moveToPoint:[pointValue pointValue]];
-				}
-				else {
-					[path lineToPoint:[pointValue pointValue]];
-				}
-			}
-			
-			[path closePath];
-			self.outline = path;
-		}
-	}
-	return _outline;
 }
 
 

@@ -59,6 +59,19 @@
 {
 }
 
+- (BOOL)resignFirstResponder
+{
+	BOOL didResign = [super resignFirstResponder];
+	if (didResign) {
+		[self didResignFirstResponder];
+	}
+	return didResign;
+}
+
+- (void)didResignFirstResponder
+{
+}
+
 
 
 #pragma mark - Mouse Handling
