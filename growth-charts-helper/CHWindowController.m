@@ -78,7 +78,7 @@
 
 - (void)didDropFiles:(NSNotification *)notification
 {
-	NSArray *items = [[notification userInfo] objectForKey:CHDropViewDroppedItemsKey];
+	NSArray *items = [notification userInfo][CHDropViewDroppedItemsKey];
 	if (1 == [items count]) {
 		NSPasteboardItem *item = [items lastObject];
 		NSString *urlString = [item stringForType:(NSString *)kUTTypeFileURL];
@@ -247,7 +247,7 @@
 {
 	if ([_currentAreaStack count] > sender.tag) {
 		currentAreaIndex = sender.tag;
-		CHChartAreaView *nowActive = (CHChartAreaView *)[_currentAreaStack objectAtIndex:currentAreaIndex];
+		CHChartAreaView *nowActive = (CHChartAreaView *)_currentAreaStack[currentAreaIndex];
 		if (nowActive) {
 			_pdf.activeArea = nowActive;
 			[nowActive makeFirstResponder];

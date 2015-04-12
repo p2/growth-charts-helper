@@ -51,19 +51,18 @@
 - (CHChartAreaView *)didAddArea:(CHChartArea *)area;
 - (void)didRemoveArea:(CHChartArea *)area;
 
-- (CGRect)boundingBox;
-- (CGRect)framingBox;
-- (CGRect)outlineBox;
-- (CGRect)contentBox;
+@property (nonatomic, readonly) CGRect boundingBox;
+@property (nonatomic, readonly) CGRect framingBox;
+@property (nonatomic, readonly) CGRect outlineBox;
+@property (nonatomic, readonly) CGRect contentBox;
 
 - (void)updateWithDataSource:(id<CHChartDataSource>)dataSource;
-- (NSSet *)allDataTypes;
-- (NSSet *)plotDataTypes;
+@property (nonatomic, readonly, copy) NSSet *allDataTypes;
+@property (nonatomic, readonly, copy) NSSet *plotDataTypes;
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(NSEvent *)event;
 - (NSSet *)areasAtPoint:(CGPoint)point;
 
 + (Class)registeredClassForType:(NSString *)aType;
-
 
 @end

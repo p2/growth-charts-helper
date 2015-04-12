@@ -21,5 +21,4 @@
 - (NSURL *)pdfWithSameName;
 - (void)didLoadPDFAtURL:(NSURL *)pdfURL;
 
-
 @end

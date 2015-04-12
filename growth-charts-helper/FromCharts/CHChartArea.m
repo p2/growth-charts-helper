@@ -75,7 +75,7 @@
 	NSMutableDictionary *muteDict = [dict mutableCopy];
 	
 	// type
-	self.type = [dict objectForKey:@"type"];
+	self.type = dict[@"type"];
 	if (![_type isKindOfClass:[NSString class]]) {
 		DLog(@"\"type\" must be a NSString, but I got a %@, using its description", NSStringFromClass([_type class]));
 		self.type = [_type description];
@@ -83,7 +83,7 @@
 	[muteDict removeObjectForKey:@"type"];
 	
 	// page
-	NSNumber *pageNumber = [dict objectForKey:@"page"];
+	NSNumber *pageNumber = dict[@"page"];
 	if (pageNumber) {
 		NSInteger pageNum = NSNotFound;
 		if (![pageNumber isKindOfClass:[NSNumber class]]) {
@@ -98,7 +98,7 @@
 	}
 	
 	// frame
-	NSString *rectString = [dict objectForKey:@"rect"];
+	NSString *rectString = dict[@"rect"];
 	if ([rectString isKindOfClass:[NSString class]]) {
 #if TARGET_OS_IPHONE
 		self.frame = CGRectFromString(rectString);
@@ -112,7 +112,7 @@
 	}
 	
 	// outline
-	NSString *outlineString = [dict objectForKey:@"outline"];
+	NSString *outlineString = dict[@"outline"];
 	if ([outlineString isKindOfClass:[NSString class]]) {
 		NSArray *points = [outlineString componentsSeparatedByCharactersInSet:[[self class] outlinePathSplitSet]];
 		if ([points count] > 2) {
@@ -137,11 +137,11 @@
 	}
 	
 	// fonts
-	NSString *aFontName = [dict objectForKey:@"fontName"];
+	NSString *aFontName = dict[@"fontName"];
 	if ([aFontName isKindOfClass:[NSString class]]) {
 		self.fontName = aFontName;
 	}
-	NSNumber *aFontSize = [dict objectForKey:@"fontSize"];
+	NSNumber *aFontSize = dict[@"fontSize"];
 	if ([aFontSize isKindOfClass:[NSNumber class]]) {
 		self.fontSize = aFontSize;
 	}
@@ -150,31 +150,31 @@
 	}
 	
 	// data and value areas
-	NSString *aDataType = [dict objectForKey:@"dataType"];
+	NSString *aDataType = dict[@"dataType"];
 	if ([aDataType isKindOfClass:[NSString class]]) {
 		self.dataType = aDataType;
 	}
 	
 	// plot areas
-	NSDictionary *axesDict = [dict objectForKey:@"axes"];
+	NSDictionary *axesDict = dict[@"axes"];
 	if ([axesDict isKindOfClass:[NSDictionary class]]) {
 		
 		// x
-		NSDictionary *xAxisDict = [axesDict objectForKey:@"x"];
-		self.xAxisUnitName = [xAxisDict objectForKey:@"unit"];
-		self.xAxisDataType = [xAxisDict objectForKey:@"dataType"];
-		self.xAxisFrom = [NSDecimalNumber decimalNumberWithString:[[xAxisDict objectForKey:@"from"] description]];
-		self.xAxisTo = [NSDecimalNumber decimalNumberWithString:[[xAxisDict objectForKey:@"to"] description]];
+		NSDictionary *xAxisDict = axesDict[@"x"];
+		self.xAxisUnitName = xAxisDict[@"unit"];
+		self.xAxisDataType = xAxisDict[@"dataType"];
+		self.xAxisFrom = [NSDecimalNumber decimalNumberWithString:[xAxisDict[@"from"] description]];
+		self.xAxisTo = [NSDecimalNumber decimalNumberWithString:[xAxisDict[@"to"] description]];
 		
 		// y
-		NSDictionary *yAxisDict = [axesDict objectForKey:@"y"];
-		self.yAxisUnitName = [yAxisDict objectForKey:@"unit"];
-		self.yAxisDataType = [yAxisDict objectForKey:@"dataType"];
-		self.yAxisFrom = [NSDecimalNumber decimalNumberWithString:[[yAxisDict objectForKey:@"from"] description]];
-		self.yAxisTo = [NSDecimalNumber decimalNumberWithString:[[yAxisDict objectForKey:@"to"] description]];
+		NSDictionary *yAxisDict = axesDict[@"y"];
+		self.yAxisUnitName = yAxisDict[@"unit"];
+		self.yAxisDataType = yAxisDict[@"dataType"];
+		self.yAxisFrom = [NSDecimalNumber decimalNumberWithString:[yAxisDict[@"from"] description]];
+		self.yAxisTo = [NSDecimalNumber decimalNumberWithString:[yAxisDict[@"to"] description]];
 		
 		// stats source
-		NSString *statsSource = [dict objectForKey:@"statsSource"];
+		NSString *statsSource = dict[@"statsSource"];
 		if ([statsSource isKindOfClass:[NSString class]]) {
 			self.statsSource = statsSource;
 		}
@@ -187,7 +187,7 @@
 	}
 	
 	// ** sub-areas
-	NSArray *areas = [dict objectForKey:@"areas"];
+	NSArray *areas = dict[@"areas"];
 	if ([areas isKindOfClass:[NSArray class]]) {
 		if ([areas count] > 0) {
 			NSMutableArray *myAreas = [NSMutableArray arrayWithCapacity:[areas count]];
@@ -229,9 +229,9 @@
 	_type = [_type lowercaseString];
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithObject:_type forKey:@"type"];
 	if (_topmost && _page > 0) {
-		[dict setObject:[NSNumber numberWithUnsignedInteger:_page] forKey:@"page"];
+		dict[@"page"] = @(_page);
 	}
-	[dict setObject:[self frameString] forKey:@"rect"];
+	dict[@"rect"] = [self frameString];
 	
 	// the outline
 	if ([_outlinePoints count] > 2) {
@@ -245,7 +245,7 @@
 		}
 		NSString *pointString = [points componentsJoinedByString:@";"];
 		if ([pointString length] > 0) {
-			[dict setObject:pointString forKey:@"outline"];
+			dict[@"outline"] = pointString;
 		}
 	}
 	else if ([_outlinePoints count] > 0) {
@@ -267,22 +267,22 @@
 			@"to": _yAxisTo ? _yAxisTo : @0
 		};
 		
-		[dict setObject:@{@"x": x, @"y": y} forKey:@"axes"];
+		dict[@"axes"] = @{@"x": x, @"y": y};
 		if ([_statsSource length] > 0) {
-			[dict setObject:_statsSource forKey:@"statsSource"];
+			dict[@"statsSource"] = _statsSource;
 		}
 	}
 	
 	// areas with another type
 	else {
 		if ([_fontName length] > 0) {
-			[dict setObject:_fontName forKey:@"fontName"];
+			dict[@"fontName"] = _fontName;
 		}
 		if (_fontSize) {
-			[dict setObject:_fontSize forKey:@"fontSize"];
+			dict[@"fontSize"] = _fontSize;
 		}
 		if ([_dataType length] > 0) {
-			[dict setObject:_dataType forKey:@"dataType"];
+			dict[@"dataType"] = _dataType;
 		}
 	}
 	
@@ -295,7 +295,7 @@
 				[subareas addObject:json];
 			}
 		}
-		[dict setObject:subareas forKey:@"areas"];
+		dict[@"areas"] = subareas;
 	}
 	
 	return dict;

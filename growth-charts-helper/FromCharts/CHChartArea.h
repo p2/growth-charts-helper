@@ -77,5 +77,4 @@
 
 + (NSCharacterSet *)outlinePathSplitSet;
 
-
 @end

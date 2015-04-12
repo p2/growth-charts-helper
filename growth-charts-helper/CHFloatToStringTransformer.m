@@ -49,7 +49,7 @@
  */
 - (id)reverseTransformedValue:(id)value
 {
-	return [NSNumber numberWithDouble:[value doubleValue]];
+	return @([value doubleValue]);
 }
 
 

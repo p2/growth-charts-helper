@@ -92,7 +92,7 @@
 #pragma mark - Keyboard Handling
 - (void)keyDown:(NSEvent *)theEvent
 {
-	[self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
+	[self interpretKeyEvents:@[theEvent]];
 }
 
 -(void)moveUp:(id)sender

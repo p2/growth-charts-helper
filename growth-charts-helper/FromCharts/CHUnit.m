@@ -16,7 +16,7 @@
 /**
  *  This is the designated initializer.
  */
-- (id)init
+- (instancetype)init
 {
 	if ((self = [super init])) {
 		_precision = 2;
@@ -40,8 +40,8 @@
 	if ([object isKindOfClass:[NSString class]]) {
 		NSArray *parts = [object componentsSeparatedByString:@"."];
 		if (2 == [parts count]) {
-			self.dimension = [parts objectAtIndex:0];
-			self.name = [parts objectAtIndex:1];
+			self.dimension = parts[0];
+			self.name = parts[1];
 			
 			return YES;
 		}
@@ -231,22 +231,22 @@
 {
 	NSArray *parts = [aPath componentsSeparatedByString:@"."];
 	if (2 == [parts count]) {
-		NSString *dimension = [parts objectAtIndex:0];
-		NSString *name = [parts objectAtIndex:1];
+		NSString *dimension = parts[0];
+		NSString *name = parts[1];
 		
 		// instantiate the correct class
 		NSDictionary *dimDict = [self dictionaryForDimension:dimension];
 		if (dimDict) {
-			NSString *baseName = [dimDict objectForKey:@"base"];
+			NSString *baseName = dimDict[@"base"];
 			if ([baseName length] > 0) {
-				NSString *plausMin = [dimDict objectForKey:@"plausible-min"];
-				NSString *plausMax = [dimDict objectForKey:@"plausible-max"];
+				NSString *plausMin = dimDict[@"plausible-min"];
+				NSString *plausMax = dimDict[@"plausible-max"];
 				
 				// find the respective dictionary in the dimension's dictionary
 				Class class = [self classForDimension:dimension];
 				NSDictionary *dict = nil;
-				for (NSDictionary *unitDict in [dimDict objectForKey:@"units"]) {
-					if ([name isEqualToString:[unitDict objectForKey:@"name"]]) {
+				for (NSDictionary *unitDict in dimDict[@"units"]) {
+					if ([name isEqualToString:unitDict[@"name"]]) {
 						dict = unitDict;
 						break;
 					}
@@ -291,10 +291,10 @@
 	
 	CHUnit *unit = [self new];
 	unit.dimension = dimension;
-	unit.name = ([name length] > 0) ? name : [dict objectForKey:@"name"];
-	unit.label = [dict objectForKey:@"label"];
-	unit.baseMultiplier = [dict objectForKey:@"baseMultiplier"] ? [NSDecimalNumber decimalNumberWithString:[dict objectForKey:@"baseMultiplier"]] : nil;
-	NSNumber *precision = [dict objectForKey:@"precision"];
+	unit.name = ([name length] > 0) ? name : dict[@"name"];
+	unit.label = dict[@"label"];
+	unit.baseMultiplier = dict[@"baseMultiplier"] ? [NSDecimalNumber decimalNumberWithString:dict[@"baseMultiplier"]] : nil;
+	NSNumber *precision = dict[@"precision"];
 	if (precision) {
 		unit.precision = [precision shortValue];
 	}
@@ -313,11 +313,11 @@
 	NSDictionary *dimDict = [self dictionaryForDimension:dimension];
 	if (dimDict) {
 		Class class = [self classForDimension:dimension];
-		NSString *baseName = [dimDict objectForKey:@"base"];
+		NSString *baseName = dimDict[@"base"];
 		if ([baseName length] > 0) {
-			NSString *plausMin = [dimDict objectForKey:@"plausible-min"];
-			NSString *plausMax = [dimDict objectForKey:@"plausible-max"];
-			NSArray *units = [dimDict objectForKey:@"units"];
+			NSString *plausMin = dimDict[@"plausible-min"];
+			NSString *plausMax = dimDict[@"plausible-max"];
+			NSArray *units = dimDict[@"units"];
 			NSMutableArray *arr = [NSMutableArray arrayWithCapacity:[units count]];
 			
 			// loop the dimension
@@ -389,7 +389,7 @@
 {
 	if ([dimension length] > 0) {
 		NSDictionary *all = [self allUnitsDict];
-		return [all objectForKey:dimension];
+		return all[dimension];
 	}
 	return nil;
 }
@@ -416,7 +416,7 @@
 /**
  *  Assumes default units for some measurement types, e.g. "length.centimeter" for "bodylength"
  */
-+ (id)defaultUnitForDataType:(NSString *)measurementType
++ (CHUnit*)defaultUnitForDataType:(NSString *)measurementType
 {
 	if ([@"bodylength" isEqualToString:measurementType] || [@"headcircumference" isEqualToString:measurementType]) {
 		return [self newWithPath:@"length.centimeter"];

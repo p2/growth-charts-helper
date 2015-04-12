@@ -79,5 +79,4 @@
 - (BOOL)hasAreaWithDataType:(NSString *)dataType;
 - (BOOL)plotsAreaWithDataType:(NSString *)dataType;
 
-
 @end

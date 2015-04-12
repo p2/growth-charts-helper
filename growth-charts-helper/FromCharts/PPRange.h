@@ -16,19 +16,19 @@
 #import <Foundation/Foundation.h>
 
 
-typedef enum {
+typedef NS_ENUM(unsigned int, PPRangeDisplayStyle) {
 	PPRangeDisplayStyleDash = 0,				///< a - b
 	PPRangeDisplayStyleSquareBrackets			///< [a,b]
-} PPRangeDisplayStyle;
+};
 
-typedef enum {
+typedef NS_ENUM(unsigned int, PPRangeResult) {
 	PPRangeResultUndefined = 0,
 	PPRangeResultTooLow,						///< The value is too low
 	PPRangeResultJustTooLow,					///< This is not used by PPRange itself, but provided here for use by others
 	PPRangeResultOK,							///< The value is in the range
 	PPRangeResultJustTooHigh,					///< Same as just too low, not used by PPRange directly
 	PPRangeResultTooHigh						///< The value is too high
-} PPRangeResult;
+};
 
 
 /**
@@ -58,7 +58,7 @@ typedef enum {
 + (PPRange *)rangeWithString:(NSString *)string;
 + (PPRange *)rangeFrom:(NSDecimalNumber *)min to:(NSDecimalNumber *)max;
 + (PPRange *)rangeFromString:(NSString *)min toString:(NSString *)max;
-- (id)initWithString:(NSString *)string;
+- (instancetype)initWithString:(NSString *)string;
 
 - (BOOL)contains:(NSNumber *)test;
 - (PPRangeResult)test:(NSNumber *)test;
@@ -74,6 +74,5 @@ typedef enum {
 
 - (NSString *)stringValue;
 - (NSString *)stringValueWithStyle:(PPRangeDisplayStyle)style;
-
 
 @end

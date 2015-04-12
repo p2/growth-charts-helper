@@ -32,7 +32,7 @@
 
 + (id)newWithPath:(NSString *)aPath;
 + (id)newFromDictionary:(NSDictionary *)dict withName:(NSString *)name inDimension:(NSString *)dimension;
-- (NSString *)path;
+@property (nonatomic, readonly, copy) NSString *path;
 
 - (NSString *)stringValueForNumber:(NSDecimalNumber *)number;
 - (NSString *)stringValueForNumber:(NSDecimalNumber *)number withSize:(CHValueStringSize)size;
@@ -51,7 +51,6 @@
 + (NSDictionary *)dictionaryForDimension:(NSString *)dimension;
 + (Class)classForDimension:(NSString *)dimension;
 
-+ (id)defaultUnitForDataType:(NSString *)measurementType;
-
++ (CHUnit *)defaultUnitForDataType:(NSString *)measurementType;
 
 @end

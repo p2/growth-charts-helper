@@ -123,18 +123,18 @@
 		return NO;
 	}
 	
-	self.name = [dict objectForKey:@"name"];
-	self.source = [dict objectForKey:@"source"];
-	self.sourceName = [dict objectForKey:@"sourceName"];
-	self.sourceAcronym = [dict objectForKey:@"sourceAcronym"];
-	self.shortDescription = [dict objectForKey:@"description"];
-	self.gender = [[dict objectForKey:@"gender"] intValue];
+	self.name = dict[@"name"];
+	self.source = dict[@"source"];
+	self.sourceName = dict[@"sourceName"];
+	self.sourceAcronym = dict[@"sourceAcronym"];
+	self.shortDescription = dict[@"description"];
+	self.gender = [dict[@"gender"] intValue];
 	if (_gender != CHGenderFemale && _gender != CHGenderMale) {
 		_gender = CHGenderUnknown;
 	}
 	
 	// find areas
-	NSArray *areas = [dict objectForKey:@"areas"];
+	NSArray *areas = dict[@"areas"];
 	if ([areas isKindOfClass:[NSArray class]]) {
 		if ([areas count] > 0) {
 			NSMutableSet *chartSet = [NSMutableSet setWithCapacity:[areas count]];
@@ -167,21 +167,21 @@
 	
 	// fill our properties
 	if ([_name length] > 0) {
-		[dict setObject:_name forKey:@"name"];
+		dict[@"name"] = _name;
 	}
 	if ([_source length] > 0) {
-		[dict setObject:_source forKey:@"source"];
+		dict[@"source"] = _source;
 	}
 	if ([_sourceName length] > 0) {
-		[dict setObject:_sourceName forKey:@"sourceName"];
+		dict[@"sourceName"] = _sourceName;
 	}
 	if ([_sourceAcronym length] > 0) {
-		[dict setObject:_sourceAcronym forKey:@"sourceAcronym"];
+		dict[@"sourceAcronym"] = _sourceAcronym;
 	}
 	if ([_shortDescription length] > 0) {
-		[dict setObject:_shortDescription forKey:@"description"];
+		dict[@"description"] = _shortDescription;
 	}
-	[dict setObject:[NSNumber numberWithInt:_gender] forKey:@"gender"];
+	dict[@"gender"] = @(_gender);
 	
 	// add our areas
 	if ([_chartAreas count] > 0) {
@@ -196,7 +196,7 @@
 			}
 		}
 		
-		[dict setObject:areas forKey:@"areas"];
+		dict[@"areas"] = areas;
 	}
 	
 	return dict;

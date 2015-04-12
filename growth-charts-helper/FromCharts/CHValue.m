@@ -152,7 +152,7 @@
 - (BOOL)setFromJSONObject:(id)obj
 {
 	if ([obj isKindOfClass:[NSDictionary class]]) {
-		NSString *number = [obj objectForKey:@"number"];
+		NSString *number = obj[@"number"];
 		if ([number isKindOfClass:[NSString class]]) {
 			self.number = [NSDecimalNumber decimalNumberWithString:number];
 		}
@@ -160,7 +160,7 @@
 			self.number = [NSDecimalNumber decimalNumberWithString:[number description]];
 		}
 		
-		NSString *unit = [obj objectForKey:@"unit"];
+		NSString *unit = obj[@"unit"];
 		if ([unit isKindOfClass:[NSString class]]) {
 			self.unit = [CHUnit newWithPath:unit];
 		}
@@ -173,10 +173,10 @@
 {
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 	if (_number) {
-		[dict setObject:[_number description] forKey:@"number"];		// yes, we want the number as string
+		dict[@"number"] = [_number description];		// yes, we want the number as string
 	}
 	if (_unit) {
-		[dict setObject:[_unit jsonObject] forKey:@"unit"];
+		dict[@"unit"] = [_unit jsonObject];
 	}
 	
 	return dict;

@@ -37,5 +37,4 @@
 - (NSInteger)checkPlausibility;
 - (BOOL)isNull;
 
-
 @end

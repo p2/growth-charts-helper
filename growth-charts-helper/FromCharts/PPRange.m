@@ -14,7 +14,7 @@
 @synthesize stringValue = _stringValue;
 
 
-- (id)init
+- (instancetype)init
 {
 	if ((self = [super init])) {
 		_includingFrom = YES;
@@ -54,7 +54,7 @@
 /**
  *  Initialize the range from limits given in the string
  */
-- (id)initWithString:(NSString *)string
+- (instancetype)initWithString:(NSString *)string
 {
 	if ((self = [super init])) {
 		self.stringValue = string;
@@ -98,7 +98,7 @@
 	[encoder encodeBool:_includingTo forKey:@"includingTo"];
 }
 
-- (id)initWithCoder:(NSCoder *)decoder
+- (instancetype)initWithCoder:(NSCoder *)decoder
 {
 	if ((self = [super init])) {
 		self.from = [decoder decodeObjectForKey:@"from"];
